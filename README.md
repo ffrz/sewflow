@@ -1,34 +1,21 @@
-# WashInsights
+# SewFlow – Sistem Manajemen Produksi Konveksi (Maklun & Full Production)
 
-**WashInsights** is a lightweight Business Intelligence (BI) dashboard application designed specifically for small and medium-sized car wash businesses. It enables business owners to track performance, analyze key metrics, and make informed decisions based on real-time operational data.
+SewFlow adalah sistem manajemen produksi konveksi berbasis web untuk mengelola proses produksi dari order brand, distribusi bahan, penugasan kerja kepada penjahit, hingga pembayaran. Sistem mendukung dua jenis model produksi:
 
-## 📌 Purpose
+1. **Maklun (CMT / Cut-Make-Trim)** – bahan disediakan brand.
+2. **Full Production** – semua disediakan oleh vendor (konveksi).
 
-WashInsights helps car wash owners:
-- Monitor daily transactions
-- Track income and service usage
-- Evaluate staff performance
-- Forecast revenue trends
-- Identify business bottlenecks
-- Make strategic decisions based on clean, visualized data
 
-## 🚀 Features
+## 🚀 Fitur
+- Manajemen Order Produksi (Maklun & Full)
+- Manajemen Distribusi Bahan (dari Brand atau dari Vendor)
+- Penugasan Kerja kepada Penjahit
+- Pelaporan Penyelesaian Pekerjaan (Work Return)
+- Pembayaran Penjahit Otomatis
+- QC dan Catatan Perbaikan
+- Faktur Penagihan Brand (untuk Full Production)
+- Dashboard Insight untuk Owner
 
-### MVP (Minimum Viable Product)
-- Multi-user login (Admin & Operator roles)
-- Service transaction recording (date, type, price, customer, area)
-- Dashboard overview of daily, weekly, monthly revenue
-- KPI tracking: Revenue per bay, Top services, Peak hours
-- Data visualization (bar, line, pie charts)
-- Exportable reports (CSV / PDF)
-- Responsive design for tablet or desktop use
-
-### Future Features
-- Customer database with visit history
-- Service reminders & loyalty tracking
-- Expense tracking
-- Multi-branch support
-- WhatsApp notification integration
 
 ## 💡 Tech Stack
 
@@ -37,5 +24,5 @@ WashInsights helps car wash owners:
 - **Database**: MySQL
 - **Charting**: ECharts
 - **Auth**: Laravel Sanctum
-- **Optional**: Docker for local development
+
 
