@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>{{ env('APP_NAME') }}</title>
-  <meta name="description" content="">
+  <meta name="description" content="{{ env('APP_NAME') }} adalah solusi digital untuk mengelola proses produksi maklun dan konveksi secara transparan, terstruktur, dan mudah diawasi — dari penyerahan bahan hingga pembayaran hasil kerja.">
   <meta name="keywords" content="">
   <link href="assets/img/favicon.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
@@ -53,7 +53,7 @@
         <div class="row gy-4">
           <div class="col-lg-6 order-lg-1 d-flex flex-column justify-content-center order-2" data-aos="fade-up">
             <h2>Kelola Produksi Konveksi dengan Efisien dan Profesional</h2>
-            <p>SewFlow adalah solusi digital untuk mengelola proses produksi maklun dan konveksi secara transparan, terstruktur, dan mudah diawasi — dari penyerahan bahan hingga pembayaran hasil kerja.</p>
+            <p>{{ env('APP_NAME') }} adalah solusi digital untuk mengelola proses produksi maklun dan konveksi secara transparan, terstruktur, dan mudah diawasi — dari penyerahan bahan hingga pembayaran hasil kerja.</p>
           </div>
           <div class="col-lg-6 order-lg-2 hero-img order-1" data-aos="zoom-out" data-aos-delay="200">
             <img src="assets/img/hero-img.jpg" class="img-fluid" style="border-radius: 10px;" alt="">
@@ -70,7 +70,7 @@
 
         <h3 class="text-center">Sistem Terintegrasi untuk Manajemen Produksi yang Lebih Baik</h3>
         <p class="mb-5 text-center">
-          SewFlow dirancang khusus untuk usaha konveksi yang bekerja sama dengan penjahit lepas
+          {{ env('APP_NAME') }} dirancang khusus untuk usaha konveksi yang bekerja sama dengan penjahit lepas
           atau tim produksi internal. Aplikasi ini membantu Anda mencatat setiap proses produksi
           secara akurat dan meminimalkan kesalahan administrasi.
         </p>
@@ -171,7 +171,7 @@
 
       <!-- Section Title -->
       <div class="container" data-aos="fade-up">
-        <h2 class="text-center">Bagaimana SewFlow Membantu Bisnis Anda?</h2>
+        <h2 class="text-center">Bagaimana {{ env('APP_NAME') }} Membantu Bisnis Anda?</h2>
         <div class="text-center">
           <p><strong>1. Transparansi & Kejelasan Proses:</strong> Setiap pengambilan bahan, pengerjaan, hingga pembayaran tercatat secara digital.</p>
           <p><strong>2. Efisiensi Waktu dan Administrasi:</strong> Kurangi pekerjaan manual yang repetitif dan fokus pada peningkatan produktivitas.</p>
@@ -191,8 +191,8 @@
         <div class="row justify-content-center text-center">
           <div class="col-lg-12">
             <h4>Mulai Sekarang!</h4>
-            <p>Daftar Sekarang dan nikmati pengalaman manajemen konveksi yang lebih mudah dan modern dengan SewFlow!</p>
-            <a href="https://wa.me/6285317404760?text=Halo+saya+ingin+mendaftar+aplikasi+SewFlow+untuk+manajemen+produksi+konveksi+usaha+saya.+Mohon+info+selanjutnya." target="_blank" class="btn-get-started">
+            <p>Daftar Sekarang dan nikmati pengalaman manajemen konveksi yang lebih mudah dan modern dengan {{ env('APP_NAME') }}!</p>
+            <a href="https://wa.me/6285317404760?text=Halo+saya+ingin+mendaftar+aplikasi+{{ env('APP_NAME') }}+untuk+manajemen+produksi+konveksi+usaha+saya.+Mohon+info+selanjutnya." target="_blank" class="btn-get-started">
               Pesan Sekrang
             </a>
           </div>
