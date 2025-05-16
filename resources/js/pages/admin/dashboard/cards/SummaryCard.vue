@@ -129,7 +129,7 @@ const goToUrl = (url, newFilter) => {
                 <q-item-label class="text-white text-h6 text-weight-bolder">
                   {{ $page.props.data.active_technician_count }}
                 </q-item-label>
-                <q-item-label>Teknisi Aktif</q-item-label>
+                <q-item-label>Penjahit Aktif</q-item-label>
               </q-item-section>
             </q-item>
           </div>
@@ -141,9 +141,9 @@ const goToUrl = (url, newFilter) => {
               </q-item-section>
               <q-item-section class=" q-pa-md q-ml-none  text-white">
                 <q-item-label class="text-white text-h6 text-weight-bolder">
-                  {{ $page.props.data.active_customer_count }}
+                  5
                 </q-item-label>
-                <q-item-label>Pelanggan Aktif</q-item-label>
+                <q-item-label>Brand Aktif</q-item-label>
               </q-item-section>
             </q-item>
           </div>

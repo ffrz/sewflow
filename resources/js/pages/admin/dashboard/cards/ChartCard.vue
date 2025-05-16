@@ -48,7 +48,7 @@ const page = usePage();
 const monthly_orders_chart = {
   tooltip: { show: true },
   title: {
-    text: "Servis Diterima vs Sukses vs Gagal",
+    text: "Pesanan Diterima vs Selesai",
     textStyle: { color: "#444" },
     left: "center",
   },
@@ -57,7 +57,6 @@ const monthly_orders_chart = {
     data: [
       page.props.data.chart1_data.data[0].label,
       page.props.data.chart1_data.data[1].label,
-      page.props.data.chart1_data.data[2].label,
     ],
   },
   grid: { containLabel: true, left: "5px", bottom: "5px", right: "5px" },
@@ -119,7 +118,7 @@ const monthly_orders_chart = {
 const monthly_closed_orders_chart = {
   tooltip: { show: true },
   title: {
-    text: "Pendapatan Servis",
+    text: "Pendapatan Konveksi",
     textStyle: { color: "#444" },
     left: "center",
   },

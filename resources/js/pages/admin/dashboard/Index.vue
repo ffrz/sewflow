@@ -68,14 +68,14 @@ const onFilterChange = () => {
           <div class="col-md-6 col-12">
             <top-card class="full-width full-height"
               :items="$page.props.data.top_customers"
-              title="Top 5 Pelanggan"
+              title="Top 5 Brand"
               route_url="admin.customer.detail"
             />
           </div>
           <div class="col-md-6 col-12">
             <top-card class="full-width full-height"
               :items="$page.props.data.top_technicians"
-              title="Top 5 Teknisi"
+              title="Top 5 Penjahit"
               route_url="admin.customer.detail"
             />
           </div>
