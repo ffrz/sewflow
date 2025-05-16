@@ -30,13 +30,9 @@
           'SERVICEORDER_SERVICESTATUSES' => \App\Models\ServiceOrder::ServiceStatuses,
           'SERVICEORDER_PAYMENTSTATUSES' => \App\Models\ServiceOrder::PaymentStatuses,
           'SERVICEORDER_REPAIRSTATUSES' => \App\Models\ServiceOrder::RepairStatuses,
-          'WASHORDER_ORDERSTATUSES' => \App\Models\WashOrder::OrderStatuses,
-          'WASHORDER_SERVICESTATUSES' => \App\Models\WashOrder::ServiceStatuses,
-          'WASHORDER_PAYMENTSTATUSES' => \App\Models\WashOrder::PaymentStatuses,
       ]) ?>;
     window.CONSTANTS.USER_ROLE_ADMIN = "{{ \App\Models\User::Role_Admin }}";
-    window.CONSTANTS.USER_ROLE_CASHIER = "{{ \App\Models\User::Role_Cashier }}";
-    window.CONSTANTS.USER_ROLE_WASHER = "{{ \App\Models\User::Role_Washer }}";
+    window.CONSTANTS.USER_Role_Tailor = "{{ \App\Models\User::Role_Tailor }}";
     window.CONSTANTS.USER_ROLE_OWNER = "{{ \App\Models\User::Role_Owner }}";
   </script>
   @routes

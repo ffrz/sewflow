@@ -120,7 +120,7 @@ class ServiceOrderController extends Controller
     {
         $customers = Customer::get(['id', 'name', 'phone', 'address']);
 
-        $washers = User::where('role', User::Role_Washer)
+        $washers = User::where('role', User::Role_Tailor)
             ->get(['id', 'name']);
 
         return inertia('admin/service-order/Editor', [

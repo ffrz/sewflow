@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Company;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -68,12 +66,5 @@ class AuthController extends Controller
     {
         $this->_logout($request);
         return redirect('/')->with('success', 'Anda telah logout.');
-    }
-
-    public function forgotPassword(Request $request) {
-        if ($request->getMethod() === 'GET') {
-            return inertia('admin/auth/ForgotPassword');
-        }
-
     }
 }

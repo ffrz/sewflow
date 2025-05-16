@@ -50,7 +50,7 @@ class SupplierController extends Controller
 
     public function duplicate($id)
     {
-        allowed_roles([User::Role_Admin, User::Role_Cashier]);
+        allowed_roles([User::Role_Admin]);
         $item = Supplier::findOrFail($id);
         $item->id = null;
         $item->created_at = null;
@@ -61,7 +61,7 @@ class SupplierController extends Controller
 
     public function editor($id = 0)
     {
-        allowed_roles([User::Role_Admin, User::Role_Cashier]);
+        allowed_roles([User::Role_Admin]);
         $item = $id ? Supplier::findOrFail($id) : new Supplier(['active' => true]);
         return inertia('admin/supplier/Editor', [
             'data' => $item,

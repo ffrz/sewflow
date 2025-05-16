@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class CustomerController extends Controller
 {
@@ -51,7 +50,7 @@ class CustomerController extends Controller
 
     public function duplicate($id)
     {
-        allowed_roles([User::Role_Admin, User::Role_Cashier]);
+        allowed_roles([User::Role_Admin]);
         $item = Customer::findOrFail($id);
         $item->id = null;
         $item->created_at = null;
@@ -62,7 +61,7 @@ class CustomerController extends Controller
 
     public function editor($id = 0)
     {
-        allowed_roles([User::Role_Admin, User::Role_Cashier]);
+        allowed_roles([User::Role_Admin]);
         $item = $id ? Customer::findOrFail($id) : new Customer(['active' => true]);
         return inertia('admin/customer/Editor', [
             'data' => $item,
