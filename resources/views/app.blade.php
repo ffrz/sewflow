@@ -26,10 +26,6 @@
           'STOCKADJUSTMENT_TYPES' => \App\Models\StockAdjustment::Types,
           'STOCKADJUSTMENT_STATUSES' => \App\Models\StockAdjustment::Statuses,
 
-          'SERVICEORDER_ORDERSTATUSES' => \App\Models\ServiceOrder::OrderStatuses,
-          'SERVICEORDER_SERVICESTATUSES' => \App\Models\ServiceOrder::ServiceStatuses,
-          'SERVICEORDER_PAYMENTSTATUSES' => \App\Models\ServiceOrder::PaymentStatuses,
-          'SERVICEORDER_REPAIRSTATUSES' => \App\Models\ServiceOrder::RepairStatuses,
       ]) ?>;
     window.CONSTANTS.USER_ROLE_ADMIN = "{{ \App\Models\User::Role_Admin }}";
     window.CONSTANTS.USER_Role_Tailor = "{{ \App\Models\User::Role_Tailor }}";

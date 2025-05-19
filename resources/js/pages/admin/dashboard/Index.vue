@@ -52,7 +52,7 @@ const onFilterChange = () => {
         </div>
       </q-toolbar>
     </template>
-    <div class="q-pa-sm">
+    <div class="q-pa-sm" v-if="0">
       <div>
         <div class="text-subtitle1 text-bold text-grey-8">Statistik Aktual</div>
         <summary-card class="q-py-none" />

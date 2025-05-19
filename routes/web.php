@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CompanyProfileController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Admin\ServiceOrderController;
 use App\Http\Controllers\Admin\StockAdjustmentController;
 use App\Http\Controllers\Admin\StockMovementController;
 use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\TailorController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Middleware\Auth;
 use App\Http\Middleware\NonAuthenticated;
@@ -60,7 +62,7 @@ Route::middleware([Auth::class])->group(function () {
         Route::prefix('stock-adjustments')->group(function () {
             Route::get('', [StockAdjustmentController::class, 'index'])->name('admin.stock-adjustment.index');
             Route::get('data', [StockAdjustmentController::class, 'data'])->name('admin.stock-adjustment.data');
-            Route::match(['get', 'post'],'create', [StockAdjustmentController::class, 'create'])->name('admin.stock-adjustment.create');
+            Route::match(['get', 'post'], 'create', [StockAdjustmentController::class, 'create'])->name('admin.stock-adjustment.create');
             Route::get('editor/{id}', [StockAdjustmentController::class, 'editor'])->name('admin.stock-adjustment.editor');
             Route::post('save', [StockAdjustmentController::class, 'save'])->name('admin.stock-adjustment.save');
             Route::post('delete/{id}', [StockAdjustmentController::class, 'delete'])->name('admin.stock-adjustment.delete');
@@ -79,6 +81,28 @@ Route::middleware([Auth::class])->group(function () {
             Route::get('edit/{id}', [ProductCategoryController::class, 'editor'])->name('admin.product-category.edit');
             Route::post('save', [ProductCategoryController::class, 'save'])->name('admin.product-category.save');
             Route::post('delete/{id}', [ProductCategoryController::class, 'delete'])->name('admin.product-category.delete');
+        });
+
+        Route::prefix('brands')->group(function () {
+            Route::get('', [BrandController::class, 'index'])->name('admin.brand.index');
+            Route::get('data', [BrandController::class, 'data'])->name('admin.brand.data');
+            Route::get('add', [BrandController::class, 'editor'])->name('admin.brand.add');
+            Route::get('duplicate/{id}', [BrandController::class, 'duplicate'])->name('admin.brand.duplicate');
+            Route::get('edit/{id}', [BrandController::class, 'editor'])->name('admin.brand.edit');
+            Route::get('detail/{id}', [BrandController::class, 'detail'])->name('admin.brand.detail');
+            Route::post('save', [BrandController::class, 'save'])->name('admin.brand.save');
+            Route::post('delete/{id}', [BrandController::class, 'delete'])->name('admin.brand.delete');
+        });
+
+        Route::prefix('tailors')->group(function () {
+            Route::get('', [TailorController::class, 'index'])->name('admin.tailor.index');
+            Route::get('data', [TailorController::class, 'data'])->name('admin.tailor.data');
+            Route::get('add', [TailorController::class, 'editor'])->name('admin.tailor.add');
+            Route::get('duplicate/{id}', [TailorController::class, 'duplicate'])->name('admin.tailor.duplicate');
+            Route::get('edit/{id}', [TailorController::class, 'editor'])->name('admin.tailor.edit');
+            Route::get('detail/{id}', [TailorController::class, 'detail'])->name('admin.tailor.detail');
+            Route::post('save', [TailorController::class, 'save'])->name('admin.tailor.save');
+            Route::post('delete/{id}', [TailorController::class, 'delete'])->name('admin.tailor.delete');
         });
 
         Route::prefix('customers')->group(function () {
