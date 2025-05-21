@@ -122,10 +122,10 @@ onMounted(() => {
           </q-item>
           <q-expansion-item
             v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN || $page.props.auth.user.role == $CONSTANTS.USER_ROLE_CASHIER"
-            expand-separator icon="storefront" label="Order Produksi"
-            :default-opened="$page.url.startsWith('/admin/orders') || $page.url.startsWith('/admin/customers')">
-            <q-item class="subnav" clickable v-ripple :active="$page.url.startsWith('/admin/orders')"
-              @click="router.get(route('admin.order.index'))">
+            expand-separator icon="apparel" label="Order Produksi"
+            :default-opened="$page.url.startsWith('/admin/production-orders') || $page.url.startsWith('/admin/customers') || $page.url.startsWith('/admin/tailors')">
+            <q-item class="subnav" clickable v-ripple :active="$page.url.startsWith('/admin/production-orders')"
+              @click="router.get(route('admin.production-order.index'))">
               <q-item-section avatar>
                 <q-icon name="shopping_cart" />
               </q-item-section>
@@ -139,7 +139,7 @@ onMounted(() => {
                 <q-icon name="people" />
               </q-item-section>
               <q-item-section>
-                <q-item-label>Customer / Brand</q-item-label>
+                <q-item-label>Pelanggan</q-item-label>
               </q-item-section>
             </q-item>
             <q-item class="subnav" clickable v-ripple :active="$page.url.startsWith('/admin/tailors')"

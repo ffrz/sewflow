@@ -6,7 +6,7 @@ import { check_role, getQueryParams } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import dayjs from "dayjs";
 
-const title = "Order";
+const title = "Order Produksi";
 const $q = useQuasar();
 const showFilter = ref(false);
 const rows = ref([]);
@@ -34,9 +34,9 @@ const columns = [
     sortable: true,
   },
   {
-    name: "brand",
-    label: "Brand",
-    field: "brand",
+    name: "customer",
+    label: "Pelanggan",
+    field: "customer",
     align: "left",
     sortable: true,
   },
@@ -66,7 +66,7 @@ onMounted(() => {
 const deleteItem = (row) =>
   handleDelete({
     message: `Hapus order #${row.id}?`,
-    url: route("admin.order.delete", row.id),
+    url: route("admin.production-order.delete", row.id),
     fetchItemsCallback: fetchItems,
     loading,
   });
@@ -77,16 +77,16 @@ const fetchItems = (props = null) => {
     filter,
     props,
     rows,
-    url: route("admin.order.data"),
+    url: route("admin.production-order.data"),
     loading,
   });
 };
 
 const onFilterChange = () => fetchItems();
-const onRowClicked = (row) => router.get(route('admin.order.edit', { id: row.id }));
+const onRowClicked = (row) => router.get(route('admin.production-order.edit', { id: row.id }));
 const computedColumns = computed(() => {
   if ($q.screen.gt.sm) return columns;
-  return columns.filter((col) => col.name === "name" || col.name === "action");
+  return columns.filter((col) => col.name === "id" || col.name === "action");
 });
 </script>
 
@@ -95,7 +95,7 @@ const computedColumns = computed(() => {
   <authenticated-layout>
     <template #title>{{ title }}</template>
     <template #right-button>
-      <q-btn icon="add" dense color="primary" @click="router.get(route('admin.order.add'))" />
+      <q-btn icon="add" dense color="primary" @click="router.get(route('admin.production-order.add'))" />
       <q-btn class="q-ml-sm" :icon="!showFilter ? 'filter_alt' : 'filter_alt_off'" color="grey" dense
         @click="showFilter = !showFilter" />
     </template>
@@ -137,17 +137,17 @@ const computedColumns = computed(() => {
               <div>#{{ props.row.id }} - <q-icon name="history" /> {{ $dayjs(props.row.date).format('YYYY-MM-DD') }}
               </div>
               <div>
-                <q-badge>{{ $CONSTANTS.ORDER_STATUSES[props.row.status] }}</q-badge> |
-                <q-badge>{{ $CONSTANTS.ORDER_PAYMENT_STATUSES[props.row.payment_status] }}</q-badge> |
-                <q-badge>{{ $CONSTANTS.ORDER_DELIVERY_STATUSES[props.row.delivery_status] }}</q-badge>
+                <q-badge>{{ $CONSTANTS.PRODUCTION_ORDER_STATUSES[props.row.status] }}</q-badge> |
+                <q-badge>{{ $CONSTANTS.PRODUCTION_ORDER_PAYMENT_STATUSES[props.row.payment_status] }}</q-badge> |
+                <q-badge>{{ $CONSTANTS.PRODUCTION_ORDER_DELIVERY_STATUSES[props.row.delivery_status] }}</q-badge>
               </div>
-              <div><q-icon name="person" v-if="$q.screen.lt.md" /> {{ props.row.name }}</div>
-              <!-- <template v-if="$q.screen.lt.md">
-
-              </template> -->
+              <template v-if="$q.screen.lt.md">
+                <div><q-icon name="apparel" /> {{ props.row.model }}</div>
+                <div><q-icon name="person" /> {{ props.row.customer ? props.row.customer.name : '-' }}</div>
+              </template>
             </q-td>
-            <q-td key="brand" :props="props">
-              {{ props.row.brand.name }}
+            <q-td key="customer" :props="props">
+              {{ props.row.customer.name }}
             </q-td>
             <q-td key="model" :props="props">
               {{ props.row.model }}
@@ -159,7 +159,7 @@ const computedColumns = computed(() => {
                   <q-menu anchor="bottom right" self="top right" transition-show="scale" transition-hide="scale">
                     <q-list style="width: 200px">
                       <q-item clickable v-ripple v-close-popup
-                        @click.stop="router.get(route('admin.order.edit', props.row.id))">
+                        @click.stop="router.get(route('admin.production-order.edit', props.row.id))">
                         <q-item-section avatar>
                           <q-icon name="edit" />
                         </q-item-section>

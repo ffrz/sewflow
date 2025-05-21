@@ -14,12 +14,12 @@ class ProductionOrderController extends Controller
 {
     public function index()
     {
-        return inertia('admin/order/Index');
+        return inertia('admin/production-order/Index');
     }
 
     public function detail($id = 0)
     {
-        return inertia('admin/order/Detail', [
+        return inertia('admin/production-order/Detail', [
             'data' => ProductionOrder::with('customer')->findOrFail($id),
         ]);
     }
@@ -62,7 +62,7 @@ class ProductionOrderController extends Controller
             'delivery_status' => ProductionOrder::DeliveryStatus_NotSent,
         ]);
 
-        return inertia('admin/order/Editor', [
+        return inertia('admin/production-order/Editor', [
             'data' => $item,
             'customers' => Customer::where('active', '=', true)->orderBy('name', 'asc')->get(),
         ]);
@@ -71,7 +71,7 @@ class ProductionOrderController extends Controller
     public function save(Request $request)
     {
         $validated = $request->validate([
-            'brand_id' => 'required|exists:brands,id',
+            'customer_id' => 'required|exists:customers,id',
             'type' => 'required|string|max:50',
             'model' => 'required|string|max:100',
             'date' => 'required|date',
@@ -86,7 +86,7 @@ class ProductionOrderController extends Controller
         $item->fill($validated);
         $item->save();
 
-        return redirect(route('admin.order.edit', ['id' => $item->id]))->with('success', "Order #$item->id telah disimpan.");
+        return redirect(route('admin.production-order.edit', ['id' => $item->id]))->with('success', "Order #$item->id telah disimpan.");
     }
 
     public function items(Request $request)
@@ -94,7 +94,7 @@ class ProductionOrderController extends Controller
         allowed_roles([User::Role_Admin]);
         $item = ProductionOrder::with('customer')->findOrFail($request->id);
 
-        return inertia('admin/order/ItemEditor', [
+        return inertia('admin/production-order/ItemEditor', [
             'data' => $item,
             'customers' => Customer::where('active', '=', true)->orderBy('name', 'asc')->get(),
         ]);
@@ -106,7 +106,7 @@ class ProductionOrderController extends Controller
 
         $item = ProductionOrder::with('brand')->findOrFail($request->id);
 
-        return inertia('admin/order/ItemEditor', [
+        return inertia('admin/production-order/ItemEditor', [
             'data' => $item,
             'customers' => Customer::where('active', '=', true)->orderBy('name', 'asc')->get(),
         ]);

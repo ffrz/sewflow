@@ -2,19 +2,22 @@
 import { router, useForm, usePage } from "@inertiajs/vue3";
 import { handleSubmit } from "@/helpers/client-req-handler";
 import { scrollToFirstErrorField } from "@/helpers/utils";
+import { useCustomerFilter } from "@/helpers/useCustomerFilter";
 import DatePicker from "@/components/DatePicker.vue";
 import dayjs from "dayjs";
 
 const page = usePage();
-const brands = page.props.brands.map((b) => ({ label: b.name, value: b.id }));
-const types = Object.entries(window.CONSTANTS.ORDER_TYPES).map(([k, v]) => ({ label: v, value: k }));
-const statuses = Object.entries(window.CONSTANTS.ORDER_STATUSES).map(([k, v]) => ({ label: v, value: k }));
-const payment_statuses = Object.entries(window.CONSTANTS.ORDER_PAYMENT_STATUSES).map(([k, v]) => ({ label: v, value: k }));
-const delivery_statuses = Object.entries(window.CONSTANTS.ORDER_DELIVERY_STATUSES).map(([k, v]) => ({ label: v, value: k }));
+
+const { filteredCustomers, filterCustomerFn } = useCustomerFilter(page.props.customers);
+
+const types = Object.entries(window.CONSTANTS.PRODUCTION_ORDER_TYPES).map(([k, v]) => ({ label: v, value: k }));
+const statuses = Object.entries(window.CONSTANTS.PRODUCTION_ORDER_STATUSES).map(([k, v]) => ({ label: v, value: k }));
+const payment_statuses = Object.entries(window.CONSTANTS.PRODUCTION_ORDER_PAYMENT_STATUSES).map(([k, v]) => ({ label: v, value: k }));
+const delivery_statuses = Object.entries(window.CONSTANTS.PRODUCTION_ORDER_DELIVERY_STATUSES).map(([k, v]) => ({ label: v, value: k }));
 
 const form = useForm({
   id: page.props.data.id,
-  brand_id: page.props.data.brand_id,
+  customer_id: page.props.data.customer_id,
   model: page.props.data.model,
   date: dayjs(page.props.data.date).format('YYYY-MM-DD'),
   type: page.props.data.type,
@@ -25,14 +28,21 @@ const form = useForm({
 });
 
 const submit = () =>
-  handleSubmit({ form, url: route('admin.order.save') });
+  handleSubmit({ form, url: route('admin.production-order.save') });
 </script>
 <template>
   <q-form @submit.prevent="submit" @validation-error="scrollToFirstErrorField">
     <q-card-section class="q-pa-none">
       <input type="hidden" name="id" v-model="form.id" />
-      <q-select v-model="form.brand_id" label="Customer" :options="brands" map-options emit-value
-        :error="!!form.errors.brand_id" :disable="form.processing" :error-message="form.errors.brand_id" />
+      <q-select v-model="form.customer_id" label="Pelanggan" use-input input-debounce="300" clearable
+        :options="filteredCustomers" map-options emit-value @filter="filterCustomerFn" option-label="label"
+        option-value="value" :error="!!form.errors.customer_id" :disable="form.processing">
+        <template v-slot:no-option>
+          <q-item>
+            <q-item-section>Supplier tidak ditemukan</q-item-section>
+          </q-item>
+        </template>
+      </q-select>
       <q-select v-model="form.type" label="Jenis Order" :options="types" map-options emit-value
         :error="!!form.errors.type" :disable="form.processing" :error-message="form.errors.type" />
       <date-picker v-model="form.date" label="Tanggal Order" :error="!!form.errors.date" :disable="form.processing" />
