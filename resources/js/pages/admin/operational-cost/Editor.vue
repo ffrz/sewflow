@@ -38,26 +38,23 @@ const filterCategories = (val, update) => {
             <q-card-section class="q-pt-none">
               <input type="hidden" name="id" v-model="form.id" />
               <q-select autofocus v-model="form.category_id" label="Kategori" use-input input-debounce="300" clearable
-                :options="filteredCategories" map-options emit-value @filter="filterCategories" :error="!!form.errors.category_id"
-                :disable="form.processing">
+                :options="filteredCategories" map-options emit-value @filter="filterCategories"
+                :error="!!form.errors.category_id" :disable="form.processing">
                 <template v-slot:no-option>
                   <q-item>
                     <q-item-section>Kategori tidak ditemukan</q-item-section>
                   </q-item>
                 </template>
               </q-select>
-              <date-picker v-model="form.date" label="Tanggal"
-                    :error="!!form.errors.date" :disable="form.processing" />
+              <date-picker v-model="form.date" label="Tanggal" :error="!!form.errors.date" :disable="form.processing" />
               <q-input v-model.trim="form.description" label="Deskripsi" lazy-rules :error="!!form.errors.description"
                 :disable="form.processing" :error-message="form.errors.description" :rules="[
                   (val) => (val && val.length > 0) || 'Deskripsi harus diisi.',
                 ]" />
-              <LocaleNumberInput v-model:modelValue="form.amount" label="Jumlah" lazyRules
-                :disable="form.processing" :error="!!form.errors.amount"
-                :errorMessage="form.errors.amount" :rules="[]" />
+              <LocaleNumberInput v-model:modelValue="form.amount" label="Jumlah" lazyRules :disable="form.processing"
+                :error="!!form.errors.amount" :errorMessage="form.errors.amount" :rules="[]" />
               <q-input v-model.trim="form.notes" type="textarea" autogrow counter maxlength="1000" label="Catatan"
-                lazy-rules :disable="form.processing" :error="!!form.errors.notes"
-                :error-message="form.errors.notes" />
+                lazy-rules :disable="form.processing" :error="!!form.errors.notes" :error-message="form.errors.notes" />
             </q-card-section>
             <q-card-section class="q-gutter-sm">
               <q-btn icon="save" type="submit" label="Simpan" color="primary" :disable="form.processing" />
