@@ -29,7 +29,7 @@ const form = useForm({
 });
 
 const selectedCustomerLabel = computed(() => {
-  const found = filteredCustomers.value.find(c => c.value === form.customer_id)
+  const found = filteredCustomers.value.find(c => Number(c.value) === Number(form.customer_id))
   return found ? found.label : ''
 });
 
@@ -45,7 +45,7 @@ const submit = () =>
         option-value="value" :error="!!form.errors.customer_id" :disable="form.processing">
         <template v-slot:no-option>
           <q-item>
-            <q-item-section>Supplier tidak ditemukan</q-item-section>
+            <q-item-section>Pelanggan tidak ditemukan</q-item-section>
           </q-item>
         </template>
       </q-select>
