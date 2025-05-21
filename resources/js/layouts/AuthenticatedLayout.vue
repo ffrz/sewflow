@@ -203,6 +203,15 @@ onMounted(() => {
               </q-item-section>
             </q-item>
           </q-expansion-item> -->
+          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/orders')"
+            @click="router.get(route('admin.order.index'))">
+            <q-item-section avatar>
+              <q-icon name="request_quote" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Order</q-item-label>
+            </q-item-section>
+          </q-item>
           <q-expansion-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" expand-separator
             icon="database" label="Master" :default-opened="[
               '/admin/brands',

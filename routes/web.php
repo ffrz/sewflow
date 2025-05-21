@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OperationalCostCategoryController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\OperationalCostController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ServiceOrderController;
@@ -127,15 +128,15 @@ Route::middleware([Auth::class])->group(function () {
             Route::post('delete/{id}', [SupplierController::class, 'delete'])->name('admin.supplier.delete');
         });
 
-        Route::prefix('service-orders')->group(function () {
-            Route::get('', [ServiceOrderController::class, 'index'])->name('admin.service-order.index');
-            Route::get('data', [ServiceOrderController::class, 'data'])->name('admin.service-order.data');
-            Route::get('add', [ServiceOrderController::class, 'editor'])->name('admin.service-order.add');
-            Route::get('edit/{id}', [ServiceOrderController::class, 'editor'])->name('admin.service-order.edit');
-            Route::get('duplicate/{id}', [ServiceOrderController::class, 'duplicate'])->name('admin.service-order.duplicate');
-            Route::get('detail/{id}', [ServiceOrderController::class, 'detail'])->name('admin.service-order.detail');
-            Route::post('save', [ServiceOrderController::class, 'save'])->name('admin.service-order.save');
-            Route::post('delete/{id}', [ServiceOrderController::class, 'delete'])->name('admin.service-order.delete');
+        Route::prefix('orders')->group(function () {
+            Route::get('', [OrderController::class, 'index'])->name('admin.order.index');
+            Route::get('data', [OrderController::class, 'data'])->name('admin.order.data');
+            Route::get('add', [OrderController::class, 'editor'])->name('admin.order.add');
+            Route::get('edit/{id}', [OrderController::class, 'editor'])->name('admin.order.edit');
+            Route::get('duplicate/{id}', [OrderController::class, 'duplicate'])->name('admin.order.duplicate');
+            Route::get('detail/{id}', [OrderController::class, 'detail'])->name('admin.order.detail');
+            Route::post('save', [OrderController::class, 'save'])->name('admin.order.save');
+            Route::post('delete/{id}', [OrderController::class, 'delete'])->name('admin.order.delete');
         });
 
         Route::prefix('operational-cost-categories')->group(function () {
