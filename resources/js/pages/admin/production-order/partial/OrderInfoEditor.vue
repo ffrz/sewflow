@@ -3,6 +3,7 @@ import { router, useForm, usePage } from "@inertiajs/vue3";
 import { handleSubmit } from "@/helpers/client-req-handler";
 import { scrollToFirstErrorField } from "@/helpers/utils";
 import { useCustomerFilter } from "@/helpers/useCustomerFilter";
+import { computed } from "vue";
 import DatePicker from "@/components/DatePicker.vue";
 import dayjs from "dayjs";
 
@@ -27,6 +28,11 @@ const form = useForm({
   delivery_status: page.props.data.delivery_status,
 });
 
+const selectedCustomerLabel = computed(() => {
+  const found = filteredCustomers.value.find(c => c.value === form.customer_id)
+  return found ? found.label : ''
+});
+
 const submit = () =>
   handleSubmit({ form, url: route('admin.production-order.save') });
 </script>
@@ -35,7 +41,7 @@ const submit = () =>
     <q-card-section class="q-pa-none">
       <input type="hidden" name="id" v-model="form.id" />
       <q-select v-model="form.customer_id" label="Pelanggan" use-input input-debounce="300" clearable
-        :options="filteredCustomers" map-options emit-value @filter="filterCustomerFn" option-label="label"
+        :options="filteredCustomers" map-options emit-value @filter="filterCustomerFn" option-label="label" :display-value="selectedCustomerLabel"
         option-value="value" :error="!!form.errors.customer_id" :disable="form.processing">
         <template v-slot:no-option>
           <q-item>
