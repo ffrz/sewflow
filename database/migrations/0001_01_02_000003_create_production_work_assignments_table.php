@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('work_assignments', function (Blueprint $table) {
+        Schema::create('production_work_assignments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_item_id')->constrained('order_items')->onDelete('cascade');
+            $table->foreignId('order_item_id')->constrained('production_order_items')->onDelete('cascade');
             $table->foreignId('tailor_id')->constrained('tailors')->onDelete('cascade');
             $table->integer('quantity_assigned')->default(0);
             $table->dateTime('assigned_at');
@@ -22,11 +22,9 @@ return new class extends Migration
 
             $table->datetime('created_datetime')->nullable();
             $table->datetime('updated_datetime')->nullable();
-            $table->unsignedBigInteger('created_by_uid')->nullable();
-            $table->unsignedBigInteger('updated_by_uid')->nullable();
-
-            $table->foreign('created_by_uid')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('updated_by_uid')->references('id')->on('users')->onDelete('set null');
+            
+            $table->foreignId('created_by_uid')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('updated_by_uid')->nullable()->constrained('users')->onDelete('set null');
         });
     }
 
@@ -35,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('work_assignments');
+        Schema::dropIfExists('production_work_assignments');
     }
 };

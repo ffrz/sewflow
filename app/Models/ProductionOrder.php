@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-class Order extends Model
+class ProductionOrder extends Model
 {
     protected $fillable = [
-        'brand_id',
+        'customer_id',
+        'model',
         'type',
         'status',
         'payment_status',
+        'delivery_status',
         'date',
         'due_date',
         'total_quantity',
@@ -50,19 +52,30 @@ class Order extends Model
         self::PaymentStatus_Refunded => 'Dikembalikan',
     ];
 
+    const DeliveryStatus_NotSent = 'not_sent';
+    const DeliveryStatus_Sending = 'sending';
+    const DeliveryStatus_Delivered = 'delivered';
+    const DeliveryStatus_Failed = 'failed';
 
-    public function brand()
+    const DeliveryStatuses = [
+        self::DeliveryStatus_NotSent => 'Belum Dikirim',
+        self::DeliveryStatus_Sending => 'Sedang Dikirim',
+        self::DeliveryStatus_Delivered => 'Terkirim',
+        self::DeliveryStatus_Failed => 'Gagal',
+    ];
+
+    public function customer()
     {
-        return $this->belongsTo(Brand::class);
+        return $this->belongsTo(Customer::class);
     }
 
     public function orderItems()
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->hasMany(ProductionOrderItem::class);
     }
 
     public function payments()
     {
-        return $this->hasMany(BrandPayment::class);
+        return $this->hasMany(ProductionOrderPayment::class);
     }
 }

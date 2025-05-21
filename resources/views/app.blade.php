@@ -25,7 +25,10 @@
           'STOCKMOVEMENT_REFTYPES' => \App\Models\StockMovement::RefTypes,
           'STOCKADJUSTMENT_TYPES' => \App\Models\StockAdjustment::Types,
           'STOCKADJUSTMENT_STATUSES' => \App\Models\StockAdjustment::Statuses,
-
+          'PRODUCTION_ORDER_TYPES' => \App\Models\ProductionOrder::Types,
+          'PRODUCTION_ORDER_STATUSES' => \App\Models\ProductionOrder::Statuses,
+          'PRODUCTION_ORDER_PAYMENT_STATUSES' => \App\Models\ProductionOrder::PaymentStatuses,
+          'PRODUCTION_ORDER_DELIVERY_STATUSES' => \App\Models\ProductionOrder::DeliveryStatuses,
       ]) ?>;
     window.CONSTANTS.USER_ROLE_ADMIN = "{{ \App\Models\User::Role_Admin }}";
     window.CONSTANTS.USER_Role_Tailor = "{{ \App\Models\User::Role_Tailor }}";

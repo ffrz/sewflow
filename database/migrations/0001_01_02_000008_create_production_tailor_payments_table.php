@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('brand_payments', function (Blueprint $table) {
+        Schema::create('production_tailor_payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
+            $table->foreignId('work_assignment_id')->constrained('production_work_assignments')->onDelete('cascade');
             $table->decimal('amount', 15, 2);
             $table->dateTime('payment_date');
             $table->enum('payment_method', ['cash', 'transfer', 'other'])->default('transfer');
@@ -21,11 +21,9 @@ return new class extends Migration
 
             $table->datetime('created_datetime')->nullable();
             $table->datetime('updated_datetime')->nullable();
-            $table->unsignedBigInteger('created_by_uid')->nullable();
-            $table->unsignedBigInteger('updated_by_uid')->nullable();
 
-            $table->foreign('created_by_uid')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('updated_by_uid')->references('id')->on('users')->onDelete('set null');
+            $table->foreignId('created_by_uid')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('updated_by_uid')->nullable()->constrained('users')->onDelete('set null');
         });
     }
 
@@ -34,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('brand_payments');
+        Schema::dropIfExists('production_tailor_payments');
     }
 };

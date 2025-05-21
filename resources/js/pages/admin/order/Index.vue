@@ -4,6 +4,7 @@ import { router } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
 import { check_role, getQueryParams } from "@/helpers/utils";
 import { useQuasar } from "quasar";
+import dayjs from "dayjs";
 
 const title = "Order";
 const $q = useQuasar();
@@ -12,7 +13,7 @@ const rows = ref([]);
 const loading = ref(true);
 const filter = reactive({
   search: "",
-  status: "active",
+  status: "all",
   ...getQueryParams(),
 });
 
@@ -20,29 +21,29 @@ const pagination = ref({
   page: 1,
   rowsPerPage: 10,
   rowsNumber: 10,
-  sortBy: "name",
-  descending: false,
+  sortBy: "id",
+  descending: true,
 });
 
 const columns = [
   {
-    name: "name",
-    label: "Nama",
-    field: "name",
+    name: "id",
+    label: "Order",
+    field: "id",
     align: "left",
     sortable: true,
   },
   {
-    name: "phone",
-    label: "No HP",
-    field: "phone",
+    name: "brand",
+    label: "Brand",
+    field: "brand",
     align: "left",
     sortable: true,
   },
   {
-    name: "address",
-    label: "Alamat",
-    field: "address",
+    name: "model",
+    label: "Model",
+    field: "model",
     align: "left",
     sortable: true,
   },
@@ -54,8 +55,8 @@ const columns = [
 
 const statuses = [
   { value: "all", label: "Semua" },
-  { value: "active", label: "Aktif" },
-  { value: "inactive", label: "Tidak Aktif" },
+  // { value: "active", label: "Aktif" },
+  // { value: "inactive", label: "Tidak Aktif" },
 ];
 
 onMounted(() => {
@@ -64,7 +65,7 @@ onMounted(() => {
 
 const deleteItem = (row) =>
   handleDelete({
-    message: `Hapus order ${row.name}?`,
+    message: `Hapus order #${row.id}?`,
     url: route("admin.order.delete", row.id),
     fetchItemsCallback: fetchItems,
     loading,
@@ -82,7 +83,7 @@ const fetchItems = (props = null) => {
 };
 
 const onFilterChange = () => fetchItems();
-const onRowClicked = (row) => router.get(route('admin.order.detail', { id: row.id }));
+const onRowClicked = (row) => router.get(route('admin.order.edit', { id: row.id }));
 const computedColumns = computed(() => {
   if ($q.screen.gt.sm) return columns;
   return columns.filter((col) => col.name === "name" || col.name === "action");
@@ -131,20 +132,25 @@ const computedColumns = computed(() => {
         </template>
 
         <template v-slot:body="props">
-          <q-tr :props="props" :class="!props.row.active ? 'bg-red-1' : ''" class="cursor-pointer"
-            @click="onRowClicked(props.row)">
-            <q-td key="name" :props="props" class="wrap-column">
+          <q-tr :props="props" class="cursor-pointer" @click="onRowClicked(props.row)">
+            <q-td key="id" :props="props" class="wrap-column">
+              <div>#{{ props.row.id }} - <q-icon name="history" /> {{ $dayjs(props.row.date).format('YYYY-MM-DD') }}
+              </div>
+              <div>
+                <q-badge>{{ $CONSTANTS.ORDER_STATUSES[props.row.status] }}</q-badge> |
+                <q-badge>{{ $CONSTANTS.ORDER_PAYMENT_STATUSES[props.row.payment_status] }}</q-badge> |
+                <q-badge>{{ $CONSTANTS.ORDER_DELIVERY_STATUSES[props.row.delivery_status] }}</q-badge>
+              </div>
               <div><q-icon name="person" v-if="$q.screen.lt.md" /> {{ props.row.name }}</div>
-              <template v-if="$q.screen.lt.md">
-                <div><q-icon name="phone" /> {{ props.row.phone }}</div>
-                <div><q-icon name="home_pin" /> {{ props.row.address }}</div>
-              </template>
+              <!-- <template v-if="$q.screen.lt.md">
+
+              </template> -->
             </q-td>
-            <q-td key="phone" :props="props">
-              {{ props.row.phone }}
+            <q-td key="brand" :props="props">
+              {{ props.row.brand.name }}
             </q-td>
-            <q-td key="address" :props="props">
-              {{ props.row.address }}
+            <q-td key="model" :props="props">
+              {{ props.row.model }}
             </q-td>
             <q-td key="action" :props="props">
               <div class="flex justify-end">
@@ -152,13 +158,6 @@ const computedColumns = computed(() => {
                   style="height: 40px; width: 30px" @click.stop>
                   <q-menu anchor="bottom right" self="top right" transition-show="scale" transition-hide="scale">
                     <q-list style="width: 200px">
-                      <q-item clickable v-ripple v-close-popup
-                        @click.stop="router.get(route('admin.order.duplicate', props.row.id))">
-                        <q-item-section avatar>
-                          <q-icon name="file_copy" />
-                        </q-item-section>
-                        <q-item-section icon="copy"> Duplikat </q-item-section>
-                      </q-item>
                       <q-item clickable v-ripple v-close-popup
                         @click.stop="router.get(route('admin.order.edit', props.row.id))">
                         <q-item-section avatar>

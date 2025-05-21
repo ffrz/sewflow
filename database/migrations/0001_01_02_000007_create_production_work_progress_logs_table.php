@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Order;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,17 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('production_work_progress_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('brand_id')->constrained('brands')->onDelete('cascade');
-            $table->dateTime('date');
-            $table->dateTime('due_date')->nullable();
-            $table->enum('type', array_keys(Order::Types))->default(Order::Type_Maklon);
-            $table->enum('status', array_keys(Order::Statuses))->default(Order::Status_Draft);
-            $table->enum('payment_status', array_keys(Order::PaymentStatuses))->default(Order::PaymentStatus_Unpaid);
-            $table->integer('total_quantity')->default(0);
-            $table->decimal('total_price', 15, 2)->default(0);
+            $table->foreignId('work_assignment_id')->constrained('production_work_assignments')->onDelete('cascade');
+            $table->enum('status', ['assigned', 'in_progress', 'completed', 'returned']);
             $table->text('notes')->nullable();
+            $table->dateTime('logged_at');
 
             $table->datetime('created_datetime')->nullable();
             $table->datetime('updated_datetime')->nullable();
@@ -37,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('production_work_progress_logs');
     }
 };

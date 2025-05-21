@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-class OrderItem extends Model
+class ProductionOrderItem extends Model
 {
     protected $fillable = [
         'order_id',
@@ -18,7 +18,7 @@ class OrderItem extends Model
 
     public function order()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(ProductionOrder::class);
     }
 
     public function workAssignments()

@@ -17,8 +17,6 @@ class DatabaseSeeder extends Seeder
                 UserSeeder::class,
                 CustomerSeeder::class,
                 SupplierSeeder::class,
-
-                BrandSeeder::class,
                 TailorSeeder::class,
 
                 ProductCategorySeeder::class,

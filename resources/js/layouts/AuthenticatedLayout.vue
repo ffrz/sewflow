@@ -120,34 +120,38 @@ onMounted(() => {
               <q-item-label>Dashboard</q-item-label>
             </q-item-section>
           </q-item>
-          <!-- <q-item clickable v-ripple :active="$page.url.startsWith('/admin/service-orders')"
-            @click="router.get(route('admin.service-order.index'))">
-            <q-item-section avatar>
-              <q-icon name="handyman" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ $t("service_orders") }}</q-item-label>
-            </q-item-section>
-          </q-item> -->
-          <!-- <q-item clickable v-ripple :active="$page.url.startsWith('/admin/wash-orders')"
-            @click="router.get(route('admin.wash-order.index'))">
-            <q-item-section avatar>
-              <q-icon name="local_car_wash" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>Order Cuci</q-item-label>
-            </q-item-section>
-          </q-item> -->
-          <!-- <q-item clickable v-ripple :active="$page.url.startsWith('/admin/customers')"
-            @click="router.get(route('admin.customer.index'))">
-            <q-item-section avatar>
-              <q-icon name="groups_2" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ $t("customers") }}</q-item-label>
-            </q-item-section>
-          </q-item> -->
-
+          <q-expansion-item
+            v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN || $page.props.auth.user.role == $CONSTANTS.USER_ROLE_CASHIER"
+            expand-separator icon="storefront" label="Order Produksi"
+            :default-opened="$page.url.startsWith('/admin/orders') || $page.url.startsWith('/admin/customers')">
+            <q-item class="subnav" clickable v-ripple :active="$page.url.startsWith('/admin/orders')"
+              @click="router.get(route('admin.order.index'))">
+              <q-item-section avatar>
+                <q-icon name="shopping_cart" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>Order</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item class="subnav" clickable v-ripple :active="$page.url.startsWith('/admin/customers')"
+              @click="router.get(route('admin.customer.index'))">
+              <q-item-section avatar>
+                <q-icon name="people" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>Customer / Brand</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item class="subnav" clickable v-ripple :active="$page.url.startsWith('/admin/tailors')"
+              @click="router.get(route('admin.tailor.index'))">
+              <q-item-section avatar>
+                <q-icon name="person_apron" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>Penjahit</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-expansion-item>
           <!-- <q-expansion-item
             v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN || $page.props.auth.user.role == $CONSTANTS.USER_ROLE_CASHIER"
             expand-separator icon="local_shipping" label="Pembelian"
@@ -203,7 +207,7 @@ onMounted(() => {
               </q-item-section>
             </q-item>
           </q-expansion-item> -->
-          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/orders')"
+          <!-- <q-item clickable v-ripple :active="$page.url.startsWith('/admin/orders')"
             @click="router.get(route('admin.order.index'))">
             <q-item-section avatar>
               <q-icon name="request_quote" />
@@ -211,31 +215,7 @@ onMounted(() => {
             <q-item-section>
               <q-item-label>Order</q-item-label>
             </q-item-section>
-          </q-item>
-          <q-expansion-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" expand-separator
-            icon="database" label="Master" :default-opened="[
-              '/admin/brands',
-              '/admin/tailors'
-            ].some((url) => $page.url.startsWith(url))">
-            <q-item class="subnav" clickable v-ripple :active="$page.url.startsWith('/admin/brands')"
-              @click="router.get(route('admin.brand.index'))">
-              <q-item-section avatar>
-                <q-icon name="azm" />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Brand</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item class="subnav" clickable v-ripple :active="$page.url.startsWith('/admin/tailors')"
-              @click="router.get(route('admin.tailor.index'))">
-              <q-item-section avatar>
-                <q-icon name="person_apron" />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Penjahit</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-expansion-item>
+          </q-item> -->
           <q-expansion-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" expand-separator icon="paid"
             label="Operasional" :default-opened="[
               '/admin/operational-costs',

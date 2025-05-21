@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-class BrandPayment extends Model
+class PorductionOrderPayment extends Model
 {
     protected $fillable = [
         'order_id',
@@ -14,6 +14,6 @@ class BrandPayment extends Model
 
     public function order()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(ProductionOrder::class);
     }
 }
