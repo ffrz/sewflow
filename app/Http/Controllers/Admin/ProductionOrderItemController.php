@@ -15,21 +15,11 @@ class ProductionOrderItemController extends Controller
     public function data(Request $request)
     {
         $q = ProductionOrderItem::query();
+        $q->where('order_id', '=', $request->order_id);
         $q->orderBy('id', 'asc');
         $items = $q->paginate($request->get('per_page', 10))->withQueryString();
         return response()->json($items);
     }
-
-
-    // public function editor($id = 0)
-    // {
-    //     allowed_roles([User::Role_Admin]);
-    //     $item = $id ? OperationalCost::findOrFail($id) : new OperationalCost(['date' => date('Y-m-d')]);
-    //     return inertia('admin/operational-cost/Editor', [
-    //         'data' => $item,
-    //         'categories' => $this->_categories(),
-    //     ]);
-    // }
 
     public function save(Request $request)
     {

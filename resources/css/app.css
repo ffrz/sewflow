@@ -29,7 +29,7 @@ a:hover {
 }
 
 #main-nav .q-item {
-  min-height: 40px;
+  min-height: 36px !important;
 }
 
 #main-nav .subnav {
