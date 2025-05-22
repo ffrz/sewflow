@@ -23,6 +23,7 @@ class ApiController extends Controller
     public function activeTailors()
     {
         $q = Tailor::query();
+        $q->where('active', true);
         $q->orderBy('name', 'asc');
         $items = $q->get([
             'id', 'name', 'phone', 'address', 'active'
