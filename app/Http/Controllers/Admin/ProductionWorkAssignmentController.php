@@ -42,6 +42,25 @@ class ProductionWorkAssignmentController extends Controller
         $item = $request->id ? ProductionWorkAssignment::findOrFail($request->id) : new ProductionWorkAssignment([
             'order_id' => $request->order_id,
         ]);
+
+        // Ambil order_item lengkap dengan relasi work assignments
+        $orderItem = ProductionOrderItem::with('work_assignments')->findOrFail($validated['order_item_id']);
+
+        // Hitung total quantity yang sudah dipakai
+        $totalAssigned = $orderItem->work_assignments()
+            ->when($request->id, fn($q) => $q->where('id', '!=', $request->id)) // kecualikan jika sedang update
+            ->sum('quantity');
+
+        // Sisa quantity yang tersedia
+        $remainingQty = $orderItem->ordered_quantity - $totalAssigned;
+
+        // Validasi tambahan
+        if ($validated['quantity'] > $remainingQty) {
+            return response()->json(['errors' => [
+                'quantity' => 'Jumlah kwantitas melebihi sisa yang tersedia.'
+            ]], 422);
+        }
+
         $item->fill($validated);
         $item->save();
 

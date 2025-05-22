@@ -112,6 +112,22 @@ function save() {
       }
       dialog.value = false;
       Notify.create({ message: 'Penugasan berhasil disimpan.' });
+    },
+    onError: (err) => {
+      if (err.response && err.response.status === 422) {
+        const errors = err.response.data.errors || {};
+        form.errors = errors;
+
+        // Optional: tampilkan error global jika ada
+        if (err.response.data.message) {
+          Notify.create({
+            type: 'negative',
+            message: err.response.data.message,
+          });
+        }
+      } else {
+        alert('Terjadi kesalahan server.');
+      }
     }
   });
 }
@@ -222,7 +238,7 @@ const selectedOrderItem = computed(() => {
             - {{ props.row.datetime }}
             <div><q-icon name="people" /> {{ '#' + props.row.tailor?.id + ' - ' + props.row.tailor?.name }}</div>
             <div><q-icon name="apparel" /> {{ props.row.order_item?.description }} - {{ formatNumber(props.row.quantity)
-              }} potong</div>
+            }} potong</div>
             <div v-if="props.row.notes"><q-icon name="notes" /> {{ props.row.notes.substring(0, 30) }}...</div>
             <div><q-badge>{{ $CONSTANTS.PRODUCTION_WORK_ASSIGNMENT_STATUSES[props.row.status] }}</q-badge></div>
           </template>

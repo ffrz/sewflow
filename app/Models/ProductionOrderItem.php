@@ -21,13 +21,13 @@ class ProductionOrderItem extends Model
         return $this->belongsTo(ProductionOrder::class);
     }
 
-    public function workAssignments()
+    public function work_assignments()
     {
-        return $this->hasMany(WorkAssignment::class);
+        return $this->hasMany(ProductionWorkAssignment::class, 'order_item_id');
     }
 
-    public function materialDeliveries()
-    {
-        return $this->hasMany(MaterialDelivery::class);
-    }
+    // public function material_deliveries()
+    // {
+    //     return $this->hasMany(ProdcutionMaterialDelivery::class);
+    // }
 }

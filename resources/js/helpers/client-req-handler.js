@@ -39,11 +39,11 @@ export function handleSubmit(data) {
       },
       onError: (error) => {
         if (typeof onError === 'function') {
-          onError(response);
+          onError(error);
         }
 
         _scrollToFirstError();
-        if (!error || typeof (error.message) !== 'string' || error.message.length === 0)
+        if (!error || typeof (error.response?.data) === 'object' || error.message.length === 0)
           return;
 
         Notify.create({
