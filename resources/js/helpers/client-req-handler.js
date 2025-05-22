@@ -28,14 +28,14 @@ export function handleSubmit(data) {
           onSuccess(response);
         }
 
-        Notify.create({
-          message: response.message || 'Berhasil disimpan',
-          icon: "info",
-          color: "positive",
-          actions: [
-            { icon: "close", color: "white", round: true, dense: true },
-          ],
-        });
+        // Notify.create({
+        //   message: response.message || 'Berhasil disimpan',
+        //   icon: "info",
+        //   color: "positive",
+        //   actions: [
+        //     { icon: "close", color: "white", round: true, dense: true },
+        //   ],
+        // });
       },
       onError: (error) => {
         if (typeof onError === 'function') {

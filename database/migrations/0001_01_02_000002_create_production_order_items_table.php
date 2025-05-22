@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('description');
             $table->integer('ordered_quantity')->default(0);
             $table->integer('completed_quantity')->default(0);
-            $table->decimal('cost', 15, 2)->default(0);
+            $table->decimal('unit_cost', 15, 2)->default(0);
             $table->decimal('total_cost', 15, 2)->default(0);
-            $table->decimal('price', 15, 2)->default(0);
+            $table->decimal('unit_price', 15, 2)->default(0);
             $table->decimal('total_price', 15, 2)->default(0);
             $table->text('notes')->nullable();
         });

@@ -3,10 +3,11 @@ import { usePage } from "@inertiajs/vue3";
 import { ref } from "vue";
 import OrderInfoEditor from "./partial/OrderInfoEditor.vue";
 import OrderDetailsEditor from "./partial/OrderDetailsEditor.vue";
+import WorkAssignmentEditor from "./partial/WorkAssignmentEditor.vue";
 
 const page = usePage();
 const tab = ref('main');
-const title = (!!page.props.data.id ? `Order #${page.props.data.id}` : "Order Baru");
+const title = (!!page.props.data.id ? `PO #${page.props.data.id} - ${page.props.data.model}` : "Order Baru");
 
 </script>
 
@@ -30,6 +31,9 @@ const title = (!!page.props.data.id ? `Order #${page.props.data.id}` : "Order Ba
               </q-tab-panel>
               <q-tab-panel name="detail">
                 <OrderDetailsEditor />
+              </q-tab-panel>
+              <q-tab-panel name="assignment">
+                <WorkAssignmentEditor />
               </q-tab-panel>
             </q-tab-panels>
           </q-card>

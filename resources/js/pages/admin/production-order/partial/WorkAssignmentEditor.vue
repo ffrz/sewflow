@@ -8,16 +8,56 @@ import LocaleNumberInput from "@/components/LocaleNumberInput.vue";
 import { useApiForm } from '@/helpers/useApiForm';
 import { Dialog, Notify } from 'quasar'
 import { useQuasar } from "quasar";
+import DateTimePicker from "@/components/DateTimePicker.vue";
+import dayjs from "dayjs";
 
 const $q = useQuasar();
 const page = usePage();
 const dialog = ref(false);
-const show_cost = ref(true);
 const notesDialog = ref(false);
 const selectedNote = ref('');
+const selectedItem = ref(null);
+
 function showNotes(note) {
   selectedNote.value = note;
   notesDialog.value = true;
+}
+
+const statuses = [
+  { label: 'Ditugaskan', value: 'assigned' },
+  { label: 'Dikerjakan', value: 'in_progress' },
+  { label: 'Selesai', value: 'completed' },
+];
+
+let tailors = [];
+let order_items = [];
+let tailor_options = [];
+let order_item_options = [];
+
+const fetchTailors = async () => {
+  try {
+    const response = await axios.get(route('admin.tailor.data')) // Ganti sesuai endpoint
+    tailors = response.data.data;
+    tailor_options = tailors.map((i) => ({
+      label: `#${i.id} - ${i.name}`, value: i.id
+    }));
+  } catch (error) {
+    console.error('Gagal mengambil data tailors:', error)
+  }
+}
+
+const fetchOrderItems = async () => {
+  try {
+    const response = await axios.get(route('admin.production-order-item.data', {
+      order_id: page.props.data.id
+    }))
+    order_items = response.data.data
+    order_item_options = order_items.map((i) => ({
+      label: `#${i.id} - ${i.description}`, value: i.id
+    }));
+  } catch (error) {
+    console.error('Gagal mengambil data order items:', error)
+  }
 }
 
 // Data list items
@@ -26,11 +66,12 @@ const items = ref([]);
 // Form input untuk dialog
 const form = useApiForm({
   order_id: page.props.data.id,
+  datetime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
   id: null,
-  description: '',
-  ordered_quantity: 1,
-  unit_cost: 0,
-  unit_price: 0,
+  order_item_id: null,
+  tailor_id: null,
+  status: 'assigned',
+  quantity: 1,
   notes: '',
 });
 
@@ -38,18 +79,20 @@ const form = useApiForm({
 function openDialog(index = null) {
   if (index === null) {
     form.id = null;
-    form.description = '';
-    form.ordered_quantity = 1;
-    form.unit_cost = 0;
-    form.unit_price = 0;
+    form.tailor_id = null;
+    form.order_item_id = null;
+    form.datetime = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    form.quantity = 1;
+    form.status = 'assigned';
     form.notes = '';
   } else {
     const item = items.value[index];
     form.id = item.id;
-    form.description = item.description;
-    form.ordered_quantity = item.ordered_quantity;
-    form.unit_cost = item.unit_cost;
-    form.unit_price = item.unit_price;
+    form.datetime = item.datetime;
+    form.tailor_id = item.tailor_id;
+    form.order_item_id = item.order_item_id;
+    form.quantity = item.quantity;
+    form.status = item.status;
     form.notes = item.notes;
   }
   dialog.value = true;
@@ -57,19 +100,9 @@ function openDialog(index = null) {
 
 // Tambah atau update item
 function save() {
-  if (!form.description.trim()) {
-    alert('Deskripsi tidak valid');
-    return;
-  }
-
-  if (form.ordered_quantity <= 0 || form.cost < 0 || form.price < 0) {
-    alert('Kwantitas, modal, atau harga tidak valid');
-    return;
-  }
-
   handleSubmit({
     form,
-    url: route('admin.production-order-item.save'),
+    url: route('admin.production-work-assignment.save'),
     onSuccess: (res) => {
       if (Number(form.id) == 0) {
         items.value.push(res.item);
@@ -78,7 +111,7 @@ function save() {
         if (index >= 0) items.value.splice(index, 1, res.item)
       }
       dialog.value = false;
-      Notify.create({ message: 'Item berhasil disimpan.' });
+      Notify.create({ message: 'Penugasan berhasil disimpan.' });
     }
   });
 }
@@ -87,6 +120,8 @@ const loading = ref(false)
 
 onMounted(() => {
   fetchItems();
+  fetchTailors();
+  fetchOrderItems();
 });
 
 function removeItem(index) {
@@ -104,7 +139,7 @@ function removeItem(index) {
 
       // Hanya panggil API kalau item ini memang disimpan ke backend
       if (item.id) {
-        await axios.post(route('admin.production-order-item.delete', { id: item.id }));
+        await axios.post(route('admin.production-work-assignment.delete', { id: item.id }));
       }
 
       // Hapus dari array lokal
@@ -135,9 +170,8 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10,
   sortBy: "id",
-  descending: false,
+  descending: true,
 });
-
 
 const fetchItems = (props = null) => {
   handleFetchItems({
@@ -145,96 +179,68 @@ const fetchItems = (props = null) => {
     pagination,
     props,
     rows: items,
-    url: route("admin.production-order-item.data", { order_id: form.order_id }),
+    url: route("admin.production-work-assignment.data", { order_id: form.order_id }),
     loading,
   });
 };
 
-const total_qty = computed(() => {
-  return items.value.reduce((sum, item) => {
-    return sum + Number(item.ordered_quantity) || 0
-  }, 0)
-});
-
-const grand_total_cost = computed(() => {
-  return items.value.reduce((sum, item) => {
-    const qty = Number(item.ordered_quantity) || 0
-    const cost = Number(item.unit_cost) || 0
-    return sum + (qty * cost)
-  }, 0);
-})
-
-const grand_total_price = computed(() => {
-  return items.value.reduce((sum, item) => {
-    const qty = Number(item.ordered_quantity) || 0
-    const price = Number(item.unit_price) || 0
-    return sum + (qty * price)
-  }, 0);
-})
-
 const submit = () =>
-  handleSubmit({ form, url: route('admin.production-order-item.save') });
+  handleSubmit({ form, url: route('admin.production-work-assignment.save') });
 
 // Kolom untuk q-table
 const columns = [
-  { name: 'number', label: '#', field: 'number', align: 'left' },
-  { name: 'description', label: 'Item', field: 'description', align: 'left' },
-  { name: 'ordered_quantity', label: 'Kwantitas', field: 'ordered_quantity', align: 'right' },
-  { name: 'unit_cost', label: 'Modal', field: 'unit_cost', align: 'right' },
-  { name: 'subtotal_cost', label: 'Subtotal Modal', field: 'subtotal_cost', align: 'right' },
-  { name: 'unit_price', label: 'Harga', field: 'unit_price', align: 'right' },
-  { name: 'subtotal_price', label: 'Subtotal Harga', field: 'subtotal_price', align: 'right' },
+  { name: 'id', label: '#', field: 'id', align: 'left' },
+  { name: 'datetime', label: 'Waktu', field: 'datetime', align: 'left', sortable: true },
+  { name: 'item', label: 'Item', field: 'item', align: 'left' },
+  { name: 'tailor', label: 'Penjahit', field: 'tailor', align: 'left' },
+  { name: 'quantity', label: 'Jumlah', field: 'quantity', align: 'left' },
+  { name: 'status', label: 'Status', field: 'status', align: 'left' },
   { name: 'notes', label: 'Catatan', field: 'notes', align: 'left' },
   { name: 'action', label: 'Aksi', field: 'action', align: 'center' },
 ];
 
 const computedColumns = computed(() => {
-  if ($q.screen.gt.sm) {
-    if (show_cost.value) {
-      return columns;
-    }
-    const newCols = columns.filter((col) => !['unit_cost', 'subtotal_cost'].includes(col.name));
-    return newCols;
-  }
-
-  return columns.filter((col) => ['number', 'description', 'action'].includes(col.name));
+  if ($q.screen.gt.sm) return columns;
+  return columns.filter((col) => ['id', 'action'].includes(col.name));
 });
+
+const selectedOrderItem = computed(() => {
+  return order_items.find(i => i.id === form.order_item_id);
+})
 
 </script>
 
 <template>
   <q-btn icon="add" color="primary" size="sm" dense label="Tambah&nbsp;&nbsp;" @click="openDialog()" />
-  <q-checkbox label="Tampilkan Modal" v-model="show_cost" />
   <q-table :columns="computedColumns" :rows="items" row-key="number" dense flat bordered class="q-mt-md"
     @request="fetchItems" :loading="loading" :rows-per-page-options="[10, 25, 50]">
     <template v-slot:body="props">
       <q-tr :props="props" class="cursor-pointer">
-        <q-td key="number" :props="props" class="wrap-column">
-          {{ props.rowIndex + 1 }}
-        </q-td>
-        <q-td key="description" :props="props" class="wrap-column">
-          <div>{{ props.row.description }}</div>
+        <q-td key="id" :props="props" class="wrap-column">
+          {{ props.row.id }}
           <template v-if="$q.screen.lt.md">
-            <div>Q: {{ formatNumber(props.row.ordered_quantity) }} potong</div>
-            <div v-if="show_cost">M: Rp. {{ formatNumber(props.row.unit_cost) }}</div>
-            <div>H: Rp. {{ formatNumber(props.row.unit_price) }}</div>
+            - {{ props.row.datetime }}
+            <div><q-icon name="people" /> {{ '#' + props.row.tailor?.id + ' - ' + props.row.tailor?.name }}</div>
+            <div><q-icon name="apparel" /> {{ props.row.order_item?.description }} - {{ formatNumber(props.row.quantity)
+              }} potong</div>
             <div v-if="props.row.notes"><q-icon name="notes" /> {{ props.row.notes.substring(0, 30) }}...</div>
+            <div><q-badge>{{ $CONSTANTS.PRODUCTION_WORK_ASSIGNMENT_STATUSES[props.row.status] }}</q-badge></div>
           </template>
         </q-td>
-        <q-td key="ordered_quantity" :props="props" class="wrap-column">
-          {{ formatNumber(props.row.ordered_quantity) }}
+        <q-td key="datetime" :props="props" class="wrap-column">
+          <div>{{ props.row.datetime }}</div>
         </q-td>
-        <q-td key="unit_cost" :props="props" class="wrap-column">
-          {{ formatNumber(props.row.unit_cost) }}
+        <q-td key="item" :props="props" class="wrap-column">
+          {{ props.row.order_item?.description }}
         </q-td>
-        <q-td key="subtotal_cost" :props="props" class="wrap-column">
-          {{ formatNumber(props.row.ordered_quantity * props.row.unit_cost) }}
+        <q-td key="tailor" :props="props" class="wrap-column">
+          {{ props.row.tailor?.name }}
         </q-td>
-        <q-td key="unit_price" :props="props" class="wrap-column">
-          {{ formatNumber(props.row.unit_price) }}
+        <q-td key="quantity" :props="props" class="wrap-column">
+          {{ formatNumber(props.row.quantity) }}
         </q-td>
-        <q-td key="subtotal_price" :props="props" class="wrap-column">
-          {{ formatNumber(props.row.ordered_quantity * props.row.unit_price) }}
+        <q-td key="status" :props="props" class="wrap-column">
+          {{ $CONSTANTS.PRODUCTION_WORK_ASSIGNMENT_STATUSES[props.row.status] }}
         </q-td>
         <q-td key="notes" :props="props" class="wrap-column">
           <div v-if="props.row.notes">{{ props.row.notes?.substring(0, 50) }}...</div>
@@ -250,16 +256,6 @@ const computedColumns = computed(() => {
       </q-tr>
     </template>
   </q-table>
-  <div class="q-pt-md flex justify-end q-gutter-sm">
-    <div class="bg-grey-4 q-pa-sm text-right" style="min-width: 100px">
-      <div class="text-caption">Total Qty:</div>
-      <div class="text-bold">{{ formatNumber(total_qty) }}</div>
-    </div>
-    <div class="bg-grey-4 q-pa-sm text-right" style="min-width: 200px">
-      <div class="text-caption">GRAND TOTAL:</div>
-      <div class="text-h6">Rp. {{ formatNumber(grand_total_price) }}</div>
-    </div>
-  </div>
 
   <q-dialog v-model="notesDialog" style="min-width: 350px;" class="q-pa-sm">
     <q-card>
@@ -279,19 +275,25 @@ const computedColumns = computed(() => {
         <q-card-section>
           <input type="hidden" name="id" v-model="form.id" />
           <input type="hidden" name="order_id" v-model="form.order_id" />
-          <q-input v-model="form.description" dense label="Deskripsi" autofocus lazy-rules :disable="form.processing"
-            :error="!!form.errors.description" :error-message="form.errors.description" :rules="[
-              (val) => (val && val.length > 0) || 'Deskripsi harus diisi.',
+          <date-time-picker v-model="form.datetime" label="Waktu" :error="!!form.errors.datetime"
+            :disable="form.processing" :error-message="form.errors.datetime" />
+          <q-select v-model="form.tailor_id" label="Penjahit" :options="tailor_options" map-options emit-value
+            :error="!!form.errors.tailor_id" :disable="form.processing" :error-message="form.errors.tailor_id" />
+          <q-select v-model="form.order_item_id" label="Order Item" :options="order_item_options" map-options emit-value
+            :error="!!form.errors.order_item_id" :disable="form.processing"
+            :error-message="form.errors.order_item_id" />
+          <div v-if="selectedOrderItem" class="q-mb-sm text-caption text-grey" dense>
+            Kwantitas tersedia: {{ selectedOrderItem.ordered_quantity }}
+          </div>
+          <q-select v-model="form.status" label="Status" :options="statuses" map-options emit-value
+            :error="!!form.errors.status" :disable="form.processing" :error-message="form.errors.status" />
+          <LocaleNumberInput v-model="form.quantity" dense label="Kwantitas" lazy-rules :disable="form.processing"
+            :error="!!form.errors.quantity" :error-message="form.errors.quantity" :rules="[
+              val => (val > 0) || 'Kwantitas harus diisi.',
+              val => (!selectedOrderItem || val <= selectedOrderItem.ordered_quantity) || `Maksimum: ${selectedOrderItem.ordered_quantity}`
+
             ]" />
-          <LocaleNumberInput v-model="form.ordered_quantity" dense label="Kwantitas" lazy-rules
-            :disable="form.processing" :error="!!form.errors.ordered_quantity"
-            :error-message="form.errors.ordered_quantity" :rules="[
-              (val) => (val > 0) || 'Kwantitas harus diisi.',
-            ]" />
-          <LocaleNumberInput v-model="form.unit_cost" dense label="Modal Jahit (Rp)" :disable="form.processing" />
-          <LocaleNumberInput v-model="form.unit_price" dense label="Harga (Rp)" :disable="form.processing" />
-          <q-input v-model="form.notes" dense label="Catatan" type="textarea" autogrow length="100"
-            :disable="form.processing" />
+          <q-input v-model="form.notes" dense label="Catatan" type="textarea" autogrow length="100" />
           <q-card-actions align="center" class="q-pt-lg">
             <q-btn icon="check" label="Simpan" color="primary" type="submit" />
             <q-btn icon="cancel" label="Batal" color="grey" v-close-popup />

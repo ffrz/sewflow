@@ -29,6 +29,7 @@
           'PRODUCTION_ORDER_STATUSES' => \App\Models\ProductionOrder::Statuses,
           'PRODUCTION_ORDER_PAYMENT_STATUSES' => \App\Models\ProductionOrder::PaymentStatuses,
           'PRODUCTION_ORDER_DELIVERY_STATUSES' => \App\Models\ProductionOrder::DeliveryStatuses,
+          'PRODUCTION_WORK_ASSIGNMENT_STATUSES' => \App\Models\ProductionWorkAssignment::Statuses,
       ]) ?>;
     window.CONSTANTS.USER_ROLE_ADMIN = "{{ \App\Models\User::Role_Admin }}";
     window.CONSTANTS.USER_Role_Tailor = "{{ \App\Models\User::Role_Tailor }}";

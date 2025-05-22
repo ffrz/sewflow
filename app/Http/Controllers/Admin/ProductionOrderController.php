@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
-use App\Models\Order;
 use App\Models\ProductionOrder;
 use App\Models\User;
 use Carbon\Carbon;
@@ -34,15 +33,17 @@ class ProductionOrderController extends Controller
 
         if (!empty($filter['search'])) {
             $q->where(function ($q) use ($filter) {
-                // $q->where('name', 'like', '%' . $filter['search'] . '%');
-                // $q->orWhere('phone', 'like', '%' . $filter['search'] . '%');
-                // $q->orWhere('address', 'like', '%' . $filter['search'] . '%');
+                $q->where('model', 'like', '%' . $filter['search'] . '%')
+                    ->orWhere('notes', 'like', '%' . $filter['search'] . '%')
+                    ->orWhereHas('customer', function ($q2) use ($filter) {
+                        $q2->where('name', 'like', '%' . $filter['search'] . '%');
+                    });
             });
         }
 
-        // if (!empty($filter['status']) && $filter['status'] != 'all') {
-        //     $q->where('status', '=', $filter['status']);
-        // }
+        if (!empty($filter['status']) && $filter['status'] != 'all') {
+            $q->where('status', '=', $filter['status']);
+        }
 
         $q->orderBy($orderBy, $orderType);
 
