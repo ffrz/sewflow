@@ -23,7 +23,9 @@ return new class extends Migration
             $table->enum('status', array_keys(ProductionOrder::Statuses))->default(ProductionOrder::Status_Draft);
             $table->enum('payment_status', array_keys(ProductionOrder::PaymentStatuses))->default(ProductionOrder::PaymentStatus_Unpaid);
             $table->enum('delivery_status', array_keys(ProductionOrder::DeliveryStatuses))->default(ProductionOrder::DeliveryStatus_NotSent);
-            $table->integer('total_quantity')->default(0);
+            $table->unsignedInteger('total_quantity')->default(0);
+            $table->unsignedInteger('completed_quantity')->default(0);
+            $table->decimal('total_cost', 15, 2)->default(0);
             $table->decimal('total_price', 15, 2)->default(0);
             $table->text('notes')->nullable();
 

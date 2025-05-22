@@ -16,7 +16,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_item_id')->constrained('production_order_items')->onDelete('cascade');
             $table->foreignId('tailor_id')->constrained('tailors')->onDelete('restrict');
-            $table->integer('quantity')->default(0);
+            $table->unsignedInteger('quantity')->default(0);
+            $table->unsignedInteger('returned_quantity')->default(0);
             $table->dateTime('datetime');
             $table->enum('status', array_keys(ProductionWorkAssignment::Statuses))->default(ProductionWorkAssignment::Status_Assigned);
             $table->text('notes')->nullable();

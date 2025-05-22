@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained('production_orders')->onDelete('cascade');
             $table->string('description');
-            $table->integer('ordered_quantity')->default(0);
-            $table->integer('completed_quantity')->default(0);
+            $table->unsignedInteger('ordered_quantity')->default(0);
+            $table->unsignedInteger('completed_quantity')->default(0);
+            $table->unsignedInteger('assigned_quantity')->default(0);;
             $table->decimal('unit_cost', 15, 2)->default(0);
             $table->decimal('total_cost', 15, 2)->default(0);
             $table->decimal('unit_price', 15, 2)->default(0);

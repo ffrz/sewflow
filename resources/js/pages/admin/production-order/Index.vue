@@ -2,7 +2,7 @@
 import { computed, onMounted, reactive, ref } from "vue";
 import { router } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
-import { check_role, getQueryParams } from "@/helpers/utils";
+import { check_role, getQueryParams, formatNumber } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import dayjs from "dayjs";
 
@@ -38,14 +38,30 @@ const columns = [
     label: "Pelanggan",
     field: "customer",
     align: "left",
-    sortable: true,
   },
   {
     name: "model",
     label: "Model",
     field: "model",
     align: "left",
-    sortable: true,
+  },
+  {
+    name: "quantity",
+    label: "Kwantitas",
+    field: "quantity",
+    align: "left",
+  },
+  {
+    name: "cost_price",
+    label: "Biaya / Harga",
+    field: "cost_price",
+    align: "left",
+  },
+  {
+    name: "progress",
+    label: "Progress",
+    field: "progress",
+    align: "left",
   },
   {
     name: "action",
@@ -136,14 +152,18 @@ const computedColumns = computed(() => {
             <q-td key="id" :props="props" class="wrap-column">
               <div>#{{ props.row.id }} - <q-icon name="history" /> {{ $dayjs(props.row.date).format('YYYY-MM-DD') }}
               </div>
-              <div>
-                <q-badge>{{ $CONSTANTS.PRODUCTION_ORDER_STATUSES[props.row.status] }}</q-badge> |
-                <q-badge>{{ $CONSTANTS.PRODUCTION_ORDER_PAYMENT_STATUSES[props.row.payment_status] }}</q-badge> |
-                <q-badge>{{ $CONSTANTS.PRODUCTION_ORDER_DELIVERY_STATUSES[props.row.delivery_status] }}</q-badge>
-              </div>
               <template v-if="$q.screen.lt.md">
                 <div><q-icon name="apparel" /> {{ props.row.model }}</div>
                 <div><q-icon name="person" /> {{ props.row.customer ? props.row.customer.name : '-' }}</div>
+                <div>
+                  <div class="q-pt-sm">{{ formatNumber(props.row.completed_quantity / props.row.total_quantity * 100)
+                    }}%</div>
+                  <q-linear-progress :value="props.row.total_quantity > 0
+                    ? props.row.completed_quantity / props.row.total_quantity
+                    : 0" color="primary" track-color="grey-3" size="10px" rounded stripe animated />
+                </div>
+                <div class="q-pt-sm">Rp. {{ formatNumber(props.row.total_cost) }} / Rp. {{
+                  formatNumber(props.row.total_price) }}</div>
               </template>
             </q-td>
             <q-td key="customer" :props="props">
@@ -151,6 +171,18 @@ const computedColumns = computed(() => {
             </q-td>
             <q-td key="model" :props="props">
               {{ props.row.model }}
+            </q-td>
+            <q-td key="quantity" :props="props">
+              {{ formatNumber(props.row.total_quantity) }} / {{ formatNumber(props.row.completed_quantity) }}
+            </q-td>
+            <q-td key="cost_price" :props="props">
+              Rp. {{ formatNumber(props.row.total_cost) }} / Rp. {{ formatNumber(props.row.total_price) }}
+            </q-td>
+            <q-td key="progress" :props="props">
+              {{ formatNumber(props.row.completed_quantity / props.row.total_quantity * 100) }}%
+              <q-linear-progress :value="props.row.total_quantity > 0
+                ? props.row.completed_quantity / props.row.total_quantity
+                : 0" color="primary" track-color="grey-3" size="10px" rounded stripe animated />
             </q-td>
             <q-td key="action" :props="props">
               <div class="flex justify-end">

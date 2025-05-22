@@ -8,6 +8,7 @@ use App\Models\ProductionOrder;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductionOrderController extends Controller
 {
@@ -29,8 +30,25 @@ class ProductionOrderController extends Controller
         $orderType = $request->get('order_type', 'desc');
         $filter = $request->get('filter', []);
 
-        $q = ProductionOrder::with('customer');
+        // Subquery untuk menghitung total return quantity per order_id
+        $subQuery = DB::table('production_work_returns as r')
+            ->join('production_work_assignments as a', 'r.assignment_id', '=', 'a.id')
+            ->join('production_order_items as i', 'a.order_item_id', '=', 'i.id')
+            ->selectRaw('i.order_id, SUM(r.quantity) as total_returned')
+            ->groupBy('i.order_id');
 
+        // Query utama
+        $q = ProductionOrder::with('customer')
+            ->leftJoinSub($subQuery, 'returns', function ($join) {
+                $join->on('production_orders.id', '=', 'returns.order_id');
+            })
+            ->select('production_orders.*')
+            ->selectRaw('COALESCE(returns.total_returned, 0) as returned_quantity')
+            ->selectRaw('CASE WHEN production_orders.total_quantity > 0 THEN 
+                        ROUND(returns.total_returned / production_orders.total_quantity * 100, 2)
+                     ELSE 0 END as progress');
+
+        // Filter
         if (!empty($filter['search'])) {
             $q->where(function ($q) use ($filter) {
                 $q->where('model', 'like', '%' . $filter['search'] . '%')
@@ -42,11 +60,12 @@ class ProductionOrderController extends Controller
         }
 
         if (!empty($filter['status']) && $filter['status'] != 'all') {
-            $q->where('status', '=', $filter['status']);
+            $q->where('production_orders.status', '=', $filter['status']);
         }
 
         $q->orderBy($orderBy, $orderType);
 
+        // Paginate dan ambil data
         $items = $q->paginate($request->get('per_page', 10))->withQueryString();
 
         return response()->json($items);
@@ -87,7 +106,10 @@ class ProductionOrderController extends Controller
         $item->fill($validated);
         $item->save();
 
-        return redirect(route('admin.production-order.edit', ['id' => $item->id]))->with('success', "Order #$item->id telah disimpan.");
+        return response()->json([
+            'data' => $item,
+            'message' => "Order $item->id telah disimpan."
+        ]);
     }
 
     public function items(Request $request)
@@ -121,7 +143,7 @@ class ProductionOrderController extends Controller
         $item->delete();
 
         return response()->json([
-            'message' => "Order $item->name telah dihapus."
+            'message' => "Order $item->id telah dihapus."
         ]);
     }
 }

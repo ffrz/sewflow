@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('production_work_returns', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('work_assignment_id')->constrained('production_work_assignments')->onDelete('cascade');
-            $table->integer('quantity_returned')->default(0);
-            $table->dateTime('returned_at');
-            $table->text('reason')->nullable();
+            $table->foreignId('assignment_id')->constrained('production_work_assignments')->onDelete('cascade');
+            $table->integer('quantity')->default(0);
+            $table->dateTime('datetime');
+            $table->text('notes')->nullable();
 
             $table->datetime('created_datetime')->nullable();
             $table->datetime('updated_datetime')->nullable();

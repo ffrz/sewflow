@@ -15,6 +15,7 @@ const dialog = ref(false);
 const show_cost = ref(true);
 const notesDialog = ref(false);
 const selectedNote = ref('');
+
 function showNotes(note) {
   selectedNote.value = note;
   notesDialog.value = true;
@@ -39,7 +40,7 @@ function openDialog(index = null) {
   if (index === null) {
     form.id = null;
     form.description = '';
-    form.ordered_quantity = 1;
+    form.ordered_quantity = 0;
     form.unit_cost = 0;
     form.unit_price = 0;
     form.notes = '';
@@ -52,6 +53,7 @@ function openDialog(index = null) {
     form.unit_price = item.unit_price;
     form.notes = item.notes;
   }
+
   dialog.value = true;
 }
 
@@ -150,6 +152,18 @@ const fetchItems = (props = null) => {
   });
 };
 
+const total_completed_qty = computed(() => {
+  return items.value.reduce((sum, item) => {
+    return sum + Number(item.completed_quantity) || 0
+  }, 0)
+});
+
+const total_assigned_qty = computed(() => {
+  return items.value.reduce((sum, item) => {
+    return sum + Number(item.assigned_quantity) || 0
+  }, 0)
+});
+
 const total_qty = computed(() => {
   return items.value.reduce((sum, item) => {
     return sum + Number(item.ordered_quantity) || 0
@@ -179,11 +193,12 @@ const submit = () =>
 const columns = [
   { name: 'number', label: '#', field: 'number', align: 'left' },
   { name: 'description', label: 'Item', field: 'description', align: 'left' },
-  { name: 'ordered_quantity', label: 'Kwantitas', field: 'ordered_quantity', align: 'right' },
-  { name: 'unit_cost', label: 'Modal', field: 'unit_cost', align: 'right' },
-  { name: 'subtotal_cost', label: 'Subtotal Modal', field: 'subtotal_cost', align: 'right' },
+  { name: 'quantity', label: 'Qty / Diambil / Selesai', field: 'quantity', align: 'right' },
+  { name: 'progress', label: 'Diambil / Selesai', field: 'progress', align: 'right' },
+  { name: 'unit_cost', label: 'Biaya', field: 'unit_cost', align: 'right' },
+  { name: 'subtotal_cost', label: 'Jml BIaya', field: 'subtotal_cost', align: 'right' },
   { name: 'unit_price', label: 'Harga', field: 'unit_price', align: 'right' },
-  { name: 'subtotal_price', label: 'Subtotal Harga', field: 'subtotal_price', align: 'right' },
+  { name: 'subtotal_price', label: 'Jml Harga', field: 'subtotal_price', align: 'right' },
   { name: 'notes', label: 'Catatan', field: 'notes', align: 'left' },
   { name: 'action', label: 'Aksi', field: 'action', align: 'center' },
 ];
@@ -204,26 +219,37 @@ const computedColumns = computed(() => {
 
 <template>
   <q-btn icon="add" color="primary" size="sm" dense label="Tambah&nbsp;&nbsp;" @click="openDialog()" />
-  <q-checkbox label="Tampilkan Modal" v-model="show_cost" />
+  <q-checkbox v-show="false" label="Tampilkan Modal" v-model="show_cost" />
   <q-table :columns="computedColumns" :rows="items" row-key="number" dense flat bordered class="q-mt-md"
     @request="fetchItems" :loading="loading" :rows-per-page-options="[10, 25, 50]">
     <template v-slot:body="props">
       <q-tr :props="props" class="cursor-pointer">
         <q-td key="number" :props="props" class="wrap-column">
-          {{ props.rowIndex + 1 }}
+          {{ props.row.id }}
         </q-td>
         <q-td key="description" :props="props" class="wrap-column">
           <div>{{ props.row.description }}</div>
           <template v-if="$q.screen.lt.md">
-            <div>Q: {{ formatNumber(props.row.ordered_quantity) }} potong</div>
-            <div v-if="show_cost">M: Rp. {{ formatNumber(props.row.unit_cost) }}</div>
-            <div>H: Rp. {{ formatNumber(props.row.unit_price) }}</div>
+            <div>Qty: {{ formatNumber(props.row.ordered_quantity) }} |
+              {{ formatNumber(props.row.assigned_quantity) }} |
+              {{ formatNumber(props.row.completed_quantity) }}</div>
+            <div v-if="show_cost">Biaya: Rp. {{ formatNumber(props.row.unit_cost) }}</div>
+            <div>Harga: Rp. {{ formatNumber(props.row.unit_price) }}</div>
+            <div><q-badge :color="props.row.completed_quantity >= props.row.ordered_quantity ? 'green' : 'red'">{{
+              props.row.completed_quantity >= props.row.ordered_quantity ? 'Selesai' : 'Progress' }}</q-badge></div>
             <div v-if="props.row.notes"><q-icon name="notes" /> {{ props.row.notes.substring(0, 30) }}...</div>
           </template>
         </q-td>
-        <q-td key="ordered_quantity" :props="props" class="wrap-column">
-          {{ formatNumber(props.row.ordered_quantity) }}
+        <q-td key="quantity" :props="props" class="wrap-column">
+          {{ formatNumber(props.row.ordered_quantity) }} |
+          {{ formatNumber(props.row.assigned_quantity) }} |
+          {{ formatNumber(props.row.completed_quantity) }}
         </q-td>
+        <q-td key="progress" :props="props" class="wrap-column">
+          {{ formatNumber(props.row.assigned_quantity / props.row.ordered_quantity * 100) }} % |
+          {{ formatNumber(props.row.completed_quantity / props.row.ordered_quantity * 100) }} %
+        </q-td>
+
         <q-td key="unit_cost" :props="props" class="wrap-column">
           {{ formatNumber(props.row.unit_cost) }}
         </q-td>
@@ -254,6 +280,14 @@ const computedColumns = computed(() => {
     <div class="bg-grey-4 q-pa-sm text-right" style="min-width: 100px">
       <div class="text-caption">Total Qty:</div>
       <div class="text-bold">{{ formatNumber(total_qty) }}</div>
+    </div>
+    <div class="bg-grey-4 q-pa-sm text-right" style="min-width: 100px">
+      <div class="text-caption">Qty Diambil:</div>
+      <div class="text-bold">{{ formatNumber(total_assigned_qty) }}</div>
+    </div>
+    <div class="bg-grey-4 q-pa-sm text-right" style="min-width: 100px">
+      <div class="text-caption">Qty Selesai:</div>
+      <div class="text-bold">{{ formatNumber(total_completed_qty) }}</div>
     </div>
     <div class="bg-grey-4 q-pa-sm text-right" style="min-width: 200px">
       <div class="text-caption">GRAND TOTAL:</div>
@@ -288,7 +322,7 @@ const computedColumns = computed(() => {
             :error-message="form.errors.ordered_quantity" :rules="[
               (val) => (val > 0) || 'Kwantitas harus diisi.',
             ]" />
-          <LocaleNumberInput v-model="form.unit_cost" dense label="Modal Jahit (Rp)" :disable="form.processing" />
+          <LocaleNumberInput v-model="form.unit_cost" dense label="Biaya (Rp)" :disable="form.processing" />
           <LocaleNumberInput v-model="form.unit_price" dense label="Harga (Rp)" :disable="form.processing" />
           <q-input v-model="form.notes" dense label="Catatan" type="textarea" autogrow length="100"
             :disable="form.processing" />

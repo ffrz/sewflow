@@ -56,9 +56,11 @@ class ProductionWorkAssignmentController extends Controller
 
         // Validasi tambahan
         if ($validated['quantity'] > $remainingQty) {
-            return response()->json(['errors' => [
-                'quantity' => 'Jumlah kwantitas melebihi sisa yang tersedia.'
-            ]], 422);
+            return response()->json([
+                'errors' => [
+                    'quantity' => "Jumlah kwantitas melebihi sisa yang tersedia ($remainingQty)."
+                ]
+            ], 422);
         }
 
         $item->fill($validated);

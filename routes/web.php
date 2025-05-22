@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ApiController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CompanyProfileController;
 use App\Http\Controllers\Admin\CustomerController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductionOrderController;
 use App\Http\Controllers\Admin\ProductionOrderItemController;
 use App\Http\Controllers\Admin\ProductionWorkAssignmentController;
+use App\Http\Controllers\Admin\ProductionWorkReturnController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\StockAdjustmentController;
 use App\Http\Controllers\Admin\StockMovementController;
@@ -38,6 +40,11 @@ Route::middleware(NonAuthenticated::class)->group(function () {
 });
 
 Route::middleware([Auth::class])->group(function () {
+    Route::prefix('api')->group(function () {
+        Route::get('active-customers', [ApiController::class, 'activeCustomers'])->name('api.active-customers');
+        Route::get('active-tailors', [ApiController::class, 'activeTailors'])->name('api.active-tailors');
+    });
+
     Route::match(['get', 'post'], 'admin/auth/logout', [AuthController::class, 'logout'])->name('admin.auth.logout');
 
     Route::prefix('admin')->group(function () {
@@ -140,6 +147,13 @@ Route::middleware([Auth::class])->group(function () {
             Route::get('data/{order_id}', [ProductionWorkAssignmentController::class, 'data'])->name('admin.production-work-assignment.data');
             Route::post('save', [ProductionWorkAssignmentController::class, 'save'])->name('admin.production-work-assignment.save');
             Route::post('delete/{id}', [ProductionWorkAssignmentController::class, 'delete'])->name('admin.production-work-assignment.delete');
+        });
+
+        Route::prefix('production-work-returns')->group(function () {
+            Route::get('data/{order_id}', [ProductionWorkReturnController::class, 'data'])->name('admin.production-work-return.data');
+            Route::get('assignments/{order_id}', [ProductionWorkReturnController::class, 'assignments'])->name('admin.production-work-return.assignments');
+            Route::post('save', [ProductionWorkReturnController::class, 'save'])->name('admin.production-work-return.save');
+            Route::post('delete/{id}', [ProductionWorkReturnController::class, 'delete'])->name('admin.production-work-return.delete');
         });
 
         Route::prefix('operational-cost-categories')->group(function () {

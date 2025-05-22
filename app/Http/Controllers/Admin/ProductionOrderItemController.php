@@ -7,6 +7,8 @@ use App\Models\OperationalCost;
 use App\Models\ProductionOrderItem;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ProductionOrderItemController extends Controller
 {
@@ -36,8 +38,11 @@ class ProductionOrderItemController extends Controller
         $item = $request->id ? ProductionOrderItem::findOrFail($request->id) : new ProductionOrderItem([
             'order_id' => $request->order_id,
         ]);
+
+        DB::beginTransaction();
         $item->fill($validated);
         $item->save();
+        DB::commit();
 
         return response()->json([
             'message' => 'Item berhasil diperbarui',
@@ -50,11 +55,14 @@ class ProductionOrderItemController extends Controller
     {
         allowed_roles([User::Role_Admin]);
 
+        DB::beginTransaction();
         $item = ProductionOrderItem::findOrFail($id);
         $item->delete();
+        DB::commit();
 
         return response()->json([
             'message' => `Item #$item->description telah dihapus.`
         ]);
     }
+
 }

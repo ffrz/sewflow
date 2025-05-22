@@ -8,6 +8,7 @@ class ProductionWorkAssignment extends Model
         'order_item_id',
         'tailor_id',
         'quantity',
+        'returned_quantity',
         'datetime',
         'status',
         'notes',
@@ -16,7 +17,7 @@ class ProductionWorkAssignment extends Model
     const Status_Assigned = 'assigned';
     const Status_InProgress = 'in_progress';
     const Status_Completed = 'completed'; // selesai tapi belum disetorkan, apakah terpakai???
-    const Status_Returned = 'returned'; 
+    const Status_Returned = 'returned';
 
     const Statuses = [
         self::Status_Assigned => 'Ditugaskan',
@@ -32,11 +33,22 @@ class ProductionWorkAssignment extends Model
 
     public function order_item()
     {
-        return $this->belongsTo(ProductionOrderItem::class);
+        return $this->belongsTo(ProductionOrderItem::class, 'order_item_id');
     }
-    
-    public function materialDeliveries()
+
+    public function returns()
     {
-        return $this->hasMany(MaterialDelivery::class);
+        return $this->hasMany(ProductionWorkReturn::class, 'assignment_id');
+    }
+
+    protected static function booted()
+    {
+        static::saved(function ($assignment) {
+            $assignment->order_item?->updateCachedQuantities();
+        });
+
+        static::deleted(function ($assignment) {
+            $assignment->order_item?->updateCachedQuantities();
+        });
     }
 }

@@ -4,6 +4,8 @@ namespace App\Models;
 
 class ProductionOrder extends Model
 {
+    public $timestamps = false;
+
     protected $fillable = [
         'customer_id',
         'model',
@@ -14,6 +16,8 @@ class ProductionOrder extends Model
         'date',
         'due_date',
         'total_quantity',
+        'completed_quantity',
+        'total_cost',
         'total_price',
         'notes',
     ];
