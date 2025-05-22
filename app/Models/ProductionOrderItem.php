@@ -6,13 +6,13 @@ class ProductionOrderItem extends Model
 {
     protected $fillable = [
         'order_id',
-        'model',
-        'size',
-        'quantity',
+        'description',
+        'ordered_quantity',
+        'completed_quantity',
+        'unit_cost',
+        'total_cost',
         'unit_price',
         'total_price',
-        'material_source',
-        'status',
         'notes',
     ];
 

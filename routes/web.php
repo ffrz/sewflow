@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\OperationalCostController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductionOrderController;
+use App\Http\Controllers\Admin\ProductionOrderItemController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\StockAdjustmentController;
 use App\Http\Controllers\Admin\StockMovementController;
@@ -126,6 +127,19 @@ Route::middleware([Auth::class])->group(function () {
             Route::get('detail/{id}', [ProductionOrderController::class, 'detail'])->name('admin.production-order.detail');
             Route::post('save', [ProductionOrderController::class, 'save'])->name('admin.production-order.save');
             Route::post('delete/{id}', [ProductionOrderController::class, 'delete'])->name('admin.production-order.delete');
+        });
+
+        Route::prefix('production-order-items')->group(function () {
+            // Route::get('', [ProductionOrderController::class, 'index'])->name('admin.production-order-item.index');
+            Route::get('data/{order_id}', [ProductionOrderItemController::class, 'data'])->name('admin.production-order-item.data');
+            // Route::get('add', [ProductionOrderController::class, 'editor'])->name('admin.production-order.add');
+            // Route::get('edit/{id}', [ProductionOrderController::class, 'editor'])->name('admin.production-order.edit');
+            // Route::get('{id}/items', [ProductionOrderController::class, 'items'])->name('admin.production-order.items');
+            // Route::get('{id}/items/{item_id}', [ProductionOrderController::class, 'itemEditor'])->name('admin.production-order.edit-item');
+            // Route::get('duplicate/{id}', [ProductionOrderController::class, 'duplicate'])->name('admin.production-order.duplicate');
+            // Route::get('detail/{id}', [ProductionOrderController::class, 'detail'])->name('admin.production-order.detail');
+            Route::post('save', [ProductionOrderItemController::class, 'save'])->name('admin.production-order-item.save');
+            Route::post('delete/{id}', [ProductionOrderItemController::class, 'delete'])->name('admin.production-order-item.delete');
         });
 
         Route::prefix('operational-cost-categories')->group(function () {

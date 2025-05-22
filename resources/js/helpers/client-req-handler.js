@@ -17,23 +17,31 @@ const _scrollToFirstError = () => {
 };
 
 export function handleSubmit(data) {
-  const { form, url } = data;
+  const { form, url, onSuccess, onError } = data;
 
   form.clearErrors();
   form.post(url,
     {
       preserveScroll: true,
       onSuccess: (response) => {
-        // Notify.create({
-        //   message: response.message,
-        //   icon: "info",
-        //   color: "positive",
-        //   actions: [
-        //     { icon: "close", color: "white", round: true, dense: true },
-        //   ],
-        // });
+        if (typeof onSuccess === 'function') {
+          onSuccess(response);
+        }
+
+        Notify.create({
+          message: response.message || 'Berhasil disimpan',
+          icon: "info",
+          color: "positive",
+          actions: [
+            { icon: "close", color: "white", round: true, dense: true },
+          ],
+        });
       },
       onError: (error) => {
+        if (typeof onError === 'function') {
+          onError(response);
+        }
+
         _scrollToFirstError();
         if (!error || typeof (error.message) !== 'string' || error.message.length === 0)
           return;

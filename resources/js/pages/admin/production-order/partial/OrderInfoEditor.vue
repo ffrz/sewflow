@@ -26,6 +26,7 @@ const form = useForm({
   status: page.props.data.status,
   payment_status: page.props.data.payment_status,
   delivery_status: page.props.data.delivery_status,
+  notes: page.props.data.notes,
 });
 
 const selectedCustomerLabel = computed(() => {
@@ -41,8 +42,9 @@ const submit = () =>
     <q-card-section class="q-pa-none">
       <input type="hidden" name="id" v-model="form.id" />
       <q-select v-model="form.customer_id" label="Pelanggan" use-input input-debounce="300" clearable
-        :options="filteredCustomers" map-options emit-value @filter="filterCustomerFn" option-label="label" :display-value="selectedCustomerLabel"
-        option-value="value" :error="!!form.errors.customer_id" :disable="form.processing">
+        :options="filteredCustomers" map-options emit-value @filter="filterCustomerFn" option-label="label"
+        :display-value="selectedCustomerLabel" option-value="value" :error="!!form.errors.customer_id"
+        :disable="form.processing">
         <template v-slot:no-option>
           <q-item>
             <q-item-section>Pelanggan tidak ditemukan</q-item-section>
@@ -53,7 +55,9 @@ const submit = () =>
         :error="!!form.errors.type" :disable="form.processing" :error-message="form.errors.type" />
       <date-picker v-model="form.date" label="Tanggal Order" :error="!!form.errors.date" :disable="form.processing" />
       <q-input v-model.trim="form.model" type="text" maxlength="100" label="Nama Model" :disable="form.processing"
-        :error="!!form.errors.model" :error-message="form.errors.model" />
+        :error="!!form.errors.model" :error-message="form.errors.model" lazy-rules :rules="[
+          (val) => (val && val.length > 0) || 'Nama harus diisi.',
+        ]" />
       <date-picker v-model="form.due_date" label="Batas Pengerjaan / Deadline" :error="!!form.errors.due_date"
         :disable="form.processing" :error-message="form.errors.due_date" />
       <q-select v-model="form.status" label="Status Order" :options="statuses" map-options emit-value
