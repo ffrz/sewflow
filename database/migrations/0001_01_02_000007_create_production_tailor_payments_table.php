@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('production_tailor_payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('work_assignment_id')->constrained('production_work_assignments')->onDelete('cascade');
-            $table->foreignId('payroll_id')->constrained('production_tailor_payrolls')->onDelete('cascade');
+            $table->foreignId('work_return_id')->constrained('production_work_returns')->onDelete('cascade');
+            $table->foreignId('payroll_id')->nullable()->constrained('production_tailor_payrolls')->onDelete('cascade');
 
+            $table->datetime('datetime');
+            $table->unsignedInteger('quantity');
+            $table->decimal('cost', 15, 2);
             $table->decimal('amount', 15, 2);
-            $table->dateTime('payment_date');
             $table->enum('payment_method', ['cash', 'transfer', 'other'])->default('cash');
             $table->text('notes')->nullable();
 

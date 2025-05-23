@@ -2,6 +2,7 @@
 import SummaryCard from "./cards/SummaryCard.vue";
 import ChartCard from "./cards/ChartCard.vue";
 import TopCard from "./cards/TopCard.vue";
+import TopCard2 from "./cards/TopCard2.vue";
 import { router } from "@inertiajs/vue3";
 import { ref } from "vue";
 import { getQueryParams } from "@/helpers/utils";
@@ -11,10 +12,8 @@ const showFilter = ref(true);
 const selected_month = ref(getQueryParams()["month"] ?? "this_month");
 
 const month_options = ref([
-  { value: "this_month", label: "Bulan Ini" },
-  { value: "prev_month", label: "1 Bulan Sebelumnya" },
-  { value: "prev_2month", label: "2 Bulan Sebelumnya" },
-  { value: "prev_3month", label: "3 Bulan Sebelumnya" },
+  { value: "this_week", label: "7 Hari Terakhir" },
+  { value: "this_month", label: "30 Hari Terakhir" },
 ]);
 const onFilterChange = () => {
   router.visit(route("admin.dashboard", { month: selected_month.value }));
@@ -52,7 +51,7 @@ const onFilterChange = () => {
         </div>
       </q-toolbar>
     </template>
-    <div class="q-pa-sm" v-if="0">
+    <div class="q-pa-sm">
       <div>
         <div class="text-subtitle1 text-bold text-grey-8">Statistik Aktual</div>
         <summary-card class="q-py-none" />
@@ -67,21 +66,33 @@ const onFilterChange = () => {
         <div class="row q-col-gutter-sm">
           <div class="col-md-6 col-12">
             <top-card class="full-width full-height"
-              :items="$page.props.data.top_customers"
+              :items="[
+                { id: 1, name: 'Alychia', total: 27515000 },
+                { id: 2, name: 'Persada', total:  7525000 },
+                { id: 3, name: 'G-Fashion', total: 5520000 },
+                { id: 4, name: 'Parinda', total: 730000 },
+                { id: 5, name: 'Anto', total: 1215000 },
+              ]"
               title="Top 5 Brand"
-              route_url="admin.customer.detail"
+              route_url="admin.customer.index"
             />
           </div>
           <div class="col-md-6 col-12">
-            <top-card class="full-width full-height"
-              :items="$page.props.data.top_technicians"
+            <top-card-2 class="full-width full-height"
+              :items="[
+                { id: 1, name: 'Deni', total: 122 },
+                { id: 2, name: 'Wanda', total: 121 },
+                { id: 3, name: 'Jeri', total: 93 },
+                { id: 4, name: 'Uden', total: 88 },
+                { id: 5, name: 'Dani', total: 60 },
+              ]"
               title="Top 5 Penjahit"
-              route_url="admin.customer.detail"
+              route_url="admin.tailor.index"
             />
           </div>
         </div>
       </div>
-      <div>
+      <div v-if="0">
         <chart-card class="q-py-none q-pt-sm" />
       </div>
     </div>

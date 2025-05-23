@@ -18,11 +18,11 @@ return new class extends Migration
             $table->dateTime('date');
             $table->dateTime('due_date')->nullable();
             $table->string('model', 100);
-            $table->string('material_info', 100)->nullable(); // apakah butuh??
-            $table->enum('type', array_keys(ProductionOrder::Types))->default(ProductionOrder::Type_Maklon);
-            $table->enum('status', array_keys(ProductionOrder::Statuses))->default(ProductionOrder::Status_Draft);
-            $table->enum('payment_status', array_keys(ProductionOrder::PaymentStatuses))->default(ProductionOrder::PaymentStatus_Unpaid);
-            $table->enum('delivery_status', array_keys(ProductionOrder::DeliveryStatuses))->default(ProductionOrder::DeliveryStatus_NotSent);
+            $table->string('material_info', 100)->nullable(); // belum digunakan
+            $table->enum('type', array_keys(ProductionOrder::Types))->default(ProductionOrder::Type_Maklon); // belum digunakan, selalu maklun
+            $table->enum('status', array_keys(ProductionOrder::Statuses))->default(ProductionOrder::Status_InProgress);
+            $table->enum('payment_status', array_keys(ProductionOrder::PaymentStatuses))->default(ProductionOrder::PaymentStatus_Unpaid);  // belum digunakan
+            $table->enum('delivery_status', array_keys(ProductionOrder::DeliveryStatuses))->default(ProductionOrder::DeliveryStatus_NotSent);  // belum digunakan
             $table->unsignedInteger('total_quantity')->default(0);
             $table->unsignedInteger('completed_quantity')->default(0);
             $table->decimal('total_cost', 15, 2)->default(0);

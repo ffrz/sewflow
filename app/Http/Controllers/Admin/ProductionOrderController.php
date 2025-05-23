@@ -77,7 +77,7 @@ class ProductionOrderController extends Controller
         $item = $id ? ProductionOrder::findOrFail($id) : new ProductionOrder([
             'date' => Carbon::now(),
             'type' => ProductionOrder::Type_Maklon,
-            'status' => ProductionOrder::Status_Draft,
+            'status' => ProductionOrder::Status_InProgress,
             'payment_status' => ProductionOrder::PaymentStatus_Unpaid,
             'delivery_status' => ProductionOrder::DeliveryStatus_NotSent,
         ]);

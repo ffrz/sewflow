@@ -16,7 +16,7 @@ const props = defineProps({
         <div v-for="(item, row) in props.items" :key="item.id">
           <div class="flex items-center justify-between">
             <span><i-link :href="route(props.route_url, {id: item.id})">{{ row + 1 }} - {{ item.name }}</i-link></span>
-            <span>Rp. {{ formatNumber(item.total) }}</span>
+            <span>{{ formatNumber(item.total) }} pt</span>
           </div>
         </div>
       </div>

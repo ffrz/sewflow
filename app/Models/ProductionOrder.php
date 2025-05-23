@@ -37,8 +37,8 @@ class ProductionOrder extends Model
     const Status_Canceled = 'canceled';
 
     const Statuses = [
-        self::Status_Draft => 'Konsep',
-        self::Status_Approved => 'Disetujui',
+        // self::Status_Draft => 'Konsep',
+        // self::Status_Approved => 'Disetujui',
         self::Status_InProgress => 'Dalam Proses',
         self::Status_Completed => 'Selesai',
         self::Status_Canceled => 'Dibatalkan',

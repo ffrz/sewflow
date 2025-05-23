@@ -19,7 +19,7 @@ const delivery_statuses = Object.entries(window.CONSTANTS.PRODUCTION_ORDER_DELIV
 
 const form = useApiForm({
   id: page.props.data.id,
-  customer_id: page.props.data.customer_id,
+  customer_id: Number(page.props.data.customer_id),
   model: page.props.data.model,
   date: dayjs(page.props.data.date).format('YYYY-MM-DD'),
   type: page.props.data.type,
@@ -73,7 +73,7 @@ const submit = () =>
         ]" />
       <date-picker v-model="form.due_date" label="Batas Pengerjaan / Deadline" :error="!!form.errors.due_date"
         :disable="form.processing" :error-message="form.errors.due_date" />
-      <q-select v-show="false" v-model="form.status" label="Status Order" :options="statuses" map-options emit-value
+      <q-select v-model="form.status" label="Status Order" :options="statuses" map-options emit-value
         :error="!!form.errors.status" :disable="form.processing" :error-message="form.errors.status" />
       <q-select v-show="false" v-model="form.payment_status" label="Status Pembayaran" :options="payment_statuses"
         map-options emit-value :error="!!form.errors.payment_status" :disable="form.processing"

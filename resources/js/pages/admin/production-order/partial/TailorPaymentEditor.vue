@@ -1,7 +1,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import { handleSubmit, handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
+import { handleSubmit, handleFetchItems } from "@/helpers/client-req-handler";
 import { formatNumber, scrollToFirstErrorField, getQueryParams } from "@/helpers/utils";
 import axios from 'axios';
 import LocaleNumberInput from "@/components/LocaleNumberInput.vue";
@@ -16,44 +16,21 @@ const page = usePage();
 const dialog = ref(false);
 const notesDialog = ref(false);
 const selectedNote = ref('');
-const selectedItem = ref(null);
-
-function showNotes(note) {
-  selectedNote.value = note;
-  notesDialog.value = true;
-}
-
-const statuses = [
-  { label: 'Ditugaskan', value: 'assigned' },
-  { label: 'Dikerjakan', value: 'in_progress' },
-  { label: 'Selesai', value: 'completed' },
-];
-
-let work_assignments = [];
-let work_assignment_options = [];
-
-const fetchWorkAssignments = async () => {
-  try {
-    const response = await axios.get(route('admin.production-tailor-payment.assignments', { order_id: page.props.data.id }))
-    work_assignments = response.data;
-    work_assignment_options = work_assignments.map((i) => ({
-      label: `#${i.id} - ${i.tailor.name} - ${i.order_item.description}: ${i.quantity} pt`, value: i.id
-    }));
-  } catch (error) {
-    console.error('Gagal mengambil data assignments:', error)
-  }
-}
-
-// Data list items
+const loading = ref(false)
 const items = ref([]);
 
-// Form input untuk dialog
+let work_returns = [];
+let work_return_options = [];
+const selectedWorkReturn = ref(null);
+
 const form = useApiForm({
+  id: null,
   order_id: page.props.data.id,
   datetime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-  id: null,
-  assignment_id: null,
+  work_return_id: null,
+  cost: 0,
   quantity: 0,
+  amount: 0,
   notes: '',
 });
 
@@ -61,16 +38,22 @@ const form = useApiForm({
 function openDialog(index = null) {
   if (index === null) {
     form.id = null;
-    form.assignment_id = null;
+    form.cost = 0;
+    form.work_return_id = null;
     form.datetime = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    form.amount = 0;
+    form.cost = 0;
     form.quantity = 0;
     form.notes = '';
   } else {
     const item = items.value[index];
     form.id = item.id;
+    form.cost = item.amount;
     form.datetime = item.datetime;
-    form.assignment_id = item.assignment_id;
-    form.quantity = item.quantity;
+    form.work_return_id = item.work_return_id;
+    form.cost = item.cost || 0;
+    form.quantity = item.quantity || 0;
+    form.amount = item.amount;
     form.notes = item.notes;
   }
   dialog.value = true;
@@ -89,7 +72,7 @@ function save() {
         if (index >= 0) items.value.splice(index, 1, res.item)
       }
       dialog.value = false;
-      Notify.create({ message: 'Penyetoran berhasil disimpan.' });
+      Notify.create({ message: 'Rekaman pembayaran telah disimpan.' });
     },
     onError: (err) => {
       if (err.response && err.response.status === 422) {
@@ -109,13 +92,6 @@ function save() {
     }
   });
 }
-
-const loading = ref(false)
-
-onMounted(() => {
-  fetchItems();
-  fetchWorkAssignments();
-});
 
 function removeItem(index) {
   const item = items.value[index];
@@ -137,7 +113,7 @@ function removeItem(index) {
       items.value.splice(index, 1);
 
       Notify.create({
-        message: 'Item berhasil dihapus'
+        message: 'Rekaman pembayaran telah dihapus.'
       });
     } catch (err) {
       Notify.create({
@@ -175,16 +151,36 @@ const fetchItems = (props = null) => {
   });
 };
 
-const submit = () =>
-  handleSubmit({ form, url: route('admin.production-work-assignment.save') });
+
+const fetchWorkReturns = async () => {
+  try {
+    const response = await axios.get(route('admin.production-tailor-payment.returns', { order_id: page.props.data.id }))
+    work_returns = response.data;
+    work_return_options = work_returns.map((i) => ({
+      label: `#${i.id} - ${i.work_assignment.tailor.name} - ${i.work_assignment.order_item.description}: ${i.quantity} pt`, value: i.id
+    }));
+  } catch (error) {
+    console.error('Gagal mengambil data pengembalian:', error)
+  }
+}
+
+function showNotes(note) {
+  selectedNote.value = note;
+  notesDialog.value = true;
+}
+
+onMounted(() => {
+  fetchItems();
+  fetchWorkReturns();
+});
 
 // Kolom untuk q-table
 const columns = [
-  { name: 'id', label: '#', field: 'id', align: 'left' },
-  { name: 'datetime', label: 'Waktu', field: 'datetime', align: 'left', sortable: true },
-  { name: 'item', label: 'Pengambilan', field: 'item', align: 'left' },
+  { name: 'id', label: 'Item', field: 'id', align: 'left' },
+  { name: 'datetime', label: 'Tanggal', field: 'datetime', align: 'left', sortable: true },
+  { name: 'item', label: 'Pengembalian', field: 'item', align: 'left' },
   { name: 'tailor', label: 'Penjahit', field: 'tailor', align: 'left' },
-  { name: 'quantity', label: 'Dikembalikan', field: 'quantity', align: 'right' },
+  { name: 'amount', label: 'Jumlah', field: 'amount', align: 'right' },
   { name: 'notes', label: 'Catatan', field: 'notes', align: 'left' },
   { name: 'action', label: 'Aksi', field: 'action', align: 'center' },
 ];
@@ -194,9 +190,16 @@ const computedColumns = computed(() => {
   return columns.filter((col) => ['id', 'action'].includes(col.name));
 });
 
-const selectedOrderItem = computed(() => {
-  return items.value.find(i => i.id === form.id);
-})
+function onWorkReturnChange(val) {
+  selectedWorkReturn.value = work_returns.find(item => item.id === val);
+  form.cost = selectedWorkReturn.value.work_assignment.order_item.unit_cost;
+  form.quantity = selectedWorkReturn.value.quantity;
+  updateTotalAmount();
+}
+
+function updateTotalAmount() {
+  form.amount = form.cost * form.quantity;
+}
 
 </script>
 
@@ -207,15 +210,16 @@ const selectedOrderItem = computed(() => {
     <template v-slot:body="props">
       <q-tr :props="props" class="cursor-pointer">
         <q-td key="id" :props="props" class="wrap-column">
-          {{ props.row.id }}
+          #{{ props.row.id }}
           <template v-if="$q.screen.lt.md">
             - {{ props.row.datetime }}
-            <div><q-icon name="people" /> #{{ props.row.work_assignment.tailor.id }} - {{
-              props.row.work_assignment.tailor.name }}</div>
-            <div><q-icon name="apparel" /> #{{ props.row.work_assignment.id }}: {{
-              props.row.work_assignment.order_item.description }} - {{
-                props.row.work_assignment.quantity }} pt</div>
-            <div><q-icon name="box" /> {{ formatNumber(props.row.quantity) }} pt</div>
+            <div><q-icon name="people" /> #{{ props.row.work_return.work_assignment.tailor.id }} - {{
+              props.row.work_return.work_assignment.tailor.name }}</div>
+            <div><q-icon name="apparel" /> #{{ props.row.work_return.work_assignment.id }}: {{
+              props.row.work_return.work_assignment.order_item.description }} - {{
+                props.row.work_return.work_assignment.quantity }} pt</div>
+            <div><q-icon name="Money" /> {{ formatNumber(props.row.quantity) }} pt x Rp. {{ formatNumber(props.row.cost)
+            }} = Rp. {{ formatNumber(props.row.amount) }}</div>
             <div v-if="props.row.notes"><q-icon name="notes" /> {{ props.row.notes.substring(0, 30) }}...</div>
           </template>
         </q-td>
@@ -223,13 +227,18 @@ const selectedOrderItem = computed(() => {
           <div>{{ props.row.datetime }}</div>
         </q-td>
         <q-td key="item" :props="props" class="wrap-column">
-          #{{ props.row.work_assignment.id }}: {{ props.row.work_assignment.order_item?.description }} : {{ props.row.work_assignment.quantity }} pt
+          #{{ props.row.work_return.work_assignment.id }}: {{
+            props.row.work_return.work_assignment.order_item?.description }} :
+          {{
+            props.row.work_return.work_assignment.quantity }} pt
         </q-td>
         <q-td key="tailor" :props="props" class="wrap-column">
-          #{{ props.row.work_assignment.tailor.id }} - {{ props.row.work_assignment.tailor.name }}
+          #{{ props.row.work_return.work_assignment.tailor.id }} - {{ props.row.work_return.work_assignment.tailor.name
+          }}
         </q-td>
-        <q-td key="quantity" :props="props" class="wrap-column">
-          {{ formatNumber(props.row.quantity) }} pt
+        <q-td key="amount" :props="props" class="wrap-column">
+          {{ formatNumber(props.row.quantity) }} pt x Rp. {{ formatNumber(props.row.cost) }} = Rp. {{
+            formatNumber(props.row.amount) }}
         </q-td>
         <q-td key="notes" :props="props" class="wrap-column">
           <div v-if="props.row.notes">{{ props.row.notes?.substring(0, 50) }}...</div>
@@ -238,7 +247,7 @@ const selectedOrderItem = computed(() => {
           <div class="flex justify-end q-gutter-xs no-wrap">
             <q-btn v-if="props.row.notes?.length > 0" dense size="sm" flat round color="grey" icon="notes"
               @click="showNotes(props.row.notes)" />
-            <q-btn dense flat round color="grey" icon="edit" @click="openDialog(props.rowIndex)" />
+            <q-btn dense flat round icon="edit" @click="openDialog(props.rowIndex)" />
             <q-btn dense flat round color="negative" icon="delete" @click="removeItem(props.rowIndex)" />
           </div>
         </q-td>
@@ -259,20 +268,25 @@ const selectedOrderItem = computed(() => {
     <q-card style="min-width: 350px;" class="q-pa-sm">
       <q-form @submit.prevent="save" @validation-error="scrollToFirstErrorField">
         <q-card-section>
-          <div class="text-h6">{{ form.id === null ? 'Tambah Item' : 'Edit Item' }}</div>
+          <div class="text-h6">{{ form.id === null ? 'Tambah Pembayaran' : 'Edit Pembayaran' }}</div>
         </q-card-section>
         <q-card-section>
           <input type="hidden" name="id" v-model="form.id" />
           <input type="hidden" name="order_id" v-model="form.order_id" />
-          <date-time-picker v-model="form.datetime" label="Waktu" :error="!!form.errors.datetime"
+          <date-time-picker v-model="form.datetime" label="Tanggal Pembayaran" :error="!!form.errors.datetime"
             :disable="form.processing" :error-message="form.errors.datetime" />
-          <q-select v-model="form.assignment_id" label="Pengambilan" :options="work_assignment_options" map-options
-            emit-value :error="!!form.errors.assignment_id" :disable="form.processing"
-            :error-message="form.errors.assignment_id" />
-          <LocaleNumberInput v-model="form.quantity" dense label="Dikembalikan" lazy-rules :disable="form.processing"
-            :error="!!form.errors.quantity" :error-message="form.errors.quantity" :rules="[
-              val => (val > 0) || 'Kwantitas harus diisi.',
-              val => (!selectedOrderItem || val <= selectedOrderItem.ordered_quantity) || `Maksimum: ${selectedOrderItem.ordered_quantity}`
+          <q-select v-model="form.work_return_id" label="Pengembalian" :options="work_return_options" map-options
+            emit-value :error="!!form.errors.work_return_id" :disable="form.processing"
+            @update:model-value="onWorkReturnChange" :error-message="form.errors.work_return_id" />
+          <LocaleNumberInput v-model="form.quantity" dense label="Qty Dikembalikan" :disable="form.processing" readonly
+            @update:model-value="updateTotalAmount" />
+          <LocaleNumberInput v-model="form.cost" dense label="Ongkos Kerja" lazy-rules :disable="form.processing"
+            readonly @update:model-value="updateTotalAmount" :rules="[
+              val => (val > 0) || 'Biaya harus diisi.',
+            ]" />
+          <LocaleNumberInput v-model="form.amount" dense label="Jumlah" lazy-rules :disable="form.processing"
+            :error="!!form.errors.amount" :error-message="form.errors.amount" :rules="[
+              val => (val > 0) || 'Jumlah harus diisi.',
             ]" />
           <q-input v-model="form.notes" dense label="Catatan" type="textarea" autogrow length="100" />
           <q-card-actions align="center" class="q-pt-lg">
