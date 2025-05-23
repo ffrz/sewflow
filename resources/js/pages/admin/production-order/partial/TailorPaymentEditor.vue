@@ -34,7 +34,7 @@ let work_assignment_options = [];
 
 const fetchWorkAssignments = async () => {
   try {
-    const response = await axios.get(route('admin.production-work-return.assignments', { order_id: page.props.data.id }))
+    const response = await axios.get(route('admin.production-tailor-payment.assignments', { order_id: page.props.data.id }))
     work_assignments = response.data;
     work_assignment_options = work_assignments.map((i) => ({
       label: `#${i.id} - ${i.tailor.name} - ${i.order_item.description}: ${i.quantity} pt`, value: i.id
@@ -80,7 +80,7 @@ function openDialog(index = null) {
 function save() {
   handleSubmit({
     form,
-    url: route('admin.production-work-return.save'),
+    url: route('admin.production-tailor-payment.save'),
     onSuccess: (res) => {
       if (Number(form.id) == 0) {
         items.value.push(res.item);
@@ -131,7 +131,7 @@ function removeItem(index) {
       loading.value = true;
 
       if (item.id) {
-        await axios.post(route('admin.production-work-return.delete', { id: item.id }));
+        await axios.post(route('admin.production-tailor-payment.delete', { id: item.id }));
       }
 
       items.value.splice(index, 1);
@@ -170,7 +170,7 @@ const fetchItems = (props = null) => {
     pagination,
     props,
     rows: items,
-    url: route("admin.production-work-return.data", { order_id: form.order_id }),
+    url: route("admin.production-tailor-payment.data", { order_id: form.order_id }),
     loading,
   });
 };

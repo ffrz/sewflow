@@ -7,6 +7,7 @@ class ProductionWorkReturn extends Model
     protected $fillable = [
         'assignment_id',
         'quantity',
+        'is_paid',
         'datetime',
         'notes',
     ];

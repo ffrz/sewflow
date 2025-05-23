@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\OperationalCostController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductionOrderController;
 use App\Http\Controllers\Admin\ProductionOrderItemController;
+use App\Http\Controllers\Admin\ProductionTailorPaymentController;
 use App\Http\Controllers\Admin\ProductionWorkAssignmentController;
 use App\Http\Controllers\Admin\ProductionWorkReturnController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -157,10 +158,10 @@ Route::middleware([Auth::class])->group(function () {
         });
 
         Route::prefix('production-tailor-payments')->group(function () {
-            Route::get('data/{order_id}', [ProductionWorkReturnController::class, 'data'])->name('admin.production-tailor-payment.data');
-            Route::get('assignments/{order_id}', [ProductionWorkReturnController::class, 'assignments'])->name('admin.production-tailor-payment.assignments');
-            Route::post('save', [ProductionWorkReturnController::class, 'save'])->name('admin.production-tailor-payment.save');
-            Route::post('delete/{id}', [ProductionWorkReturnController::class, 'delete'])->name('admin.production-tailor-payment.delete');
+            Route::get('data/{order_id}', [ProductionTailorPaymentController::class, 'data'])->name('admin.production-tailor-payment.data');
+            Route::get('assignments/{order_id}', [ProductionTailorPaymentController::class, 'assignments'])->name('admin.production-tailor-payment.assignments');
+            Route::post('save', [ProductionTailorPaymentController::class, 'save'])->name('admin.production-tailor-payment.save');
+            Route::post('delete/{id}', [ProductionTailorPaymentController::class, 'delete'])->name('admin.production-tailor-payment.delete');
         });
 
         Route::prefix('operational-cost-categories')->group(function () {

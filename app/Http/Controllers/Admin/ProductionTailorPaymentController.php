@@ -23,6 +23,7 @@ class ProductionTailorPaymentController extends Controller
 
         $items = $q->get();
 
+
         return response()->json($items);
     }
 

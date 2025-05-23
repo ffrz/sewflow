@@ -6,6 +6,7 @@ class ProductionTailorPayment extends Model
 {
     protected $fillable = [
         'work_assignment_id',
+        'payroll_id',
         'amount',
         'payment_date',
         'notes',
@@ -13,6 +14,6 @@ class ProductionTailorPayment extends Model
 
     public function work_assignment()
     {
-        return $this->belongsTo(WorkAssignment::class, 'work_assignment_id');
+        return $this->belongsTo(ProductionWorkAssignment::class, 'work_assignment_id');
     }
 }

@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('production_tailor_payments', function (Blueprint $table) {
+        Schema::create('production_tailor_payrolls', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('work_assignment_id')->constrained('production_work_assignments')->onDelete('cascade');
-            $table->decimal('amount', 15, 2);
-            $table->dateTime('payment_date');
-            $table->enum('payment_method', ['cash', 'transfer', 'other'])->default('transfer');
-            $table->text('notes')->nullable();
+            $table->foreignId('tailor_id')->constrained('tailors')->onDelete('cascade');
+            $table->date('period_start');
+            $table->date('period_end');
+            $table->decimal('total_amount', 18, 2);
+
+            $table->enum('status', ['pending', 'paid'])->default('pending');
 
             $table->datetime('created_datetime')->nullable();
             $table->datetime('updated_datetime')->nullable();
@@ -32,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('production_tailor_payments');
+        Schema::dropIfExists('production_tailor_payrolls');
     }
 };
