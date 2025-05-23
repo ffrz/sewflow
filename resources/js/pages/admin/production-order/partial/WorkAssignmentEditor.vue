@@ -1,7 +1,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import { handleSubmit, handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
+import { handleSubmit, handleFetchItems } from "@/helpers/client-req-handler";
 import { formatNumber, scrollToFirstErrorField, getQueryParams } from "@/helpers/utils";
 import axios from 'axios';
 import LocaleNumberInput from "@/components/LocaleNumberInput.vue";
@@ -16,18 +16,11 @@ const page = usePage();
 const dialog = ref(false);
 const notesDialog = ref(false);
 const selectedNote = ref('');
-const selectedItem = ref(null);
 
 function showNotes(note) {
   selectedNote.value = note;
   notesDialog.value = true;
 }
-
-const statuses = [
-  { label: 'Ditugaskan', value: 'assigned' },
-  { label: 'Dikerjakan', value: 'in_progress' },
-  { label: 'Selesai', value: 'completed' },
-];
 
 let tailors = [];
 let order_items = [];
@@ -53,7 +46,7 @@ const fetchOrderItems = async () => {
     }))
     order_items = response.data.data
     order_item_options = order_items.map((i) => ({
-      label: `#${i.id} - ${i.description}`, value: i.id
+      label: `#${i.id} : ${i.description} : ${i.ordered_quantity} pt`, value: i.id
     }));
   } catch (error) {
     console.error('Gagal mengambil data order items:', error)
@@ -200,9 +193,6 @@ const fetchItems = (props = null) => {
   });
 };
 
-const submit = () =>
-  handleSubmit({ form, url: route('admin.production-work-assignment.save') });
-
 // Kolom untuk q-table
 const columns = [
   { name: 'id', label: '#', field: 'id', align: 'left' },
@@ -210,9 +200,6 @@ const columns = [
   { name: 'item', label: 'Item', field: 'item', align: 'left' },
   { name: 'tailor', label: 'Penjahit', field: 'tailor', align: 'left' },
   { name: 'quantity', label: 'Ambil / Setor / Sisa', field: 'quantity', align: 'center' },
-  // { name: 'returned_quantity', label: 'Disetorkan', field: 'returned_quantity', align: 'right' },
-  // { name: 'remaining_quantity', label: 'Blm Setor', field: 'remaining_quantity', align: 'right' },
-  // { name: 'status', label: 'Status', field: 'status', align: 'left' },
   { name: 'notes', label: 'Catatan', field: 'notes', align: 'left' },
   { name: 'action', label: 'Aksi', field: 'action', align: 'center' },
 ];
@@ -221,10 +208,6 @@ const computedColumns = computed(() => {
   if ($q.screen.gt.sm) return columns;
   return columns.filter((col) => ['id', 'action'].includes(col.name));
 });
-
-const selectedOrderItem = computed(() => {
-  return order_items.find(i => i.id === form.order_item_id);
-})
 
 </script>
 
@@ -304,16 +287,11 @@ const selectedOrderItem = computed(() => {
           <q-select v-model="form.order_item_id" label="Order Item" :options="order_item_options" map-options emit-value
             :error="!!form.errors.order_item_id" :disable="form.processing"
             :error-message="form.errors.order_item_id" />
-          <div v-if="selectedOrderItem" class="q-mb-sm text-caption text-grey" dense>
-            Kwantitas tersedia: {{ selectedOrderItem.ordered_quantity }}
-          </div>
           <q-select v-show="false" v-model="form.status" label="Status" :options="statuses" map-options emit-value
             :error="!!form.errors.status" :disable="form.processing" :error-message="form.errors.status" />
           <LocaleNumberInput v-model="form.quantity" label="Diambil" lazy-rules :disable="form.processing"
             :error="!!form.errors.quantity" :error-message="form.errors.quantity" :rules="[
-              val => (val > 0) || 'Kwantitas harus diisi.',
-              val => (!selectedOrderItem || val <= selectedOrderItem.ordered_quantity) || `Maksimum: ${selectedOrderItem.ordered_quantity}`
-
+              val => (val > 0) || 'Kwantitas harus diisi.'
             ]" />
           <q-input v-model="form.notes" label="Catatan" type="textarea" autogrow length="100" />
           <q-card-actions align="center" class="q-pt-lg">

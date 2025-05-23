@@ -1,25 +1,33 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import { useQuasar, Dialog, Notify } from 'quasar'
-import axios from 'axios';
-import dayjs from "dayjs";
-import { handleSubmit, handleFetchItems } from "@/helpers/client-req-handler";
+import { handleSubmit, handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
 import { formatNumber, scrollToFirstErrorField, getQueryParams } from "@/helpers/utils";
-import { useApiForm } from '@/helpers/useApiForm';
+import axios from 'axios';
 import LocaleNumberInput from "@/components/LocaleNumberInput.vue";
+import { useApiForm } from '@/helpers/useApiForm';
+import { Dialog, Notify } from 'quasar'
+import { useQuasar } from "quasar";
 import DateTimePicker from "@/components/DateTimePicker.vue";
+import dayjs from "dayjs";
 
 const $q = useQuasar();
 const page = usePage();
 const dialog = ref(false);
 const notesDialog = ref(false);
 const selectedNote = ref('');
+const selectedItem = ref(null);
 
 function showNotes(note) {
   selectedNote.value = note;
   notesDialog.value = true;
 }
+
+const statuses = [
+  { label: 'Ditugaskan', value: 'assigned' },
+  { label: 'Dikerjakan', value: 'in_progress' },
+  { label: 'Selesai', value: 'completed' },
+];
 
 let work_assignments = [];
 let work_assignment_options = [];
@@ -167,6 +175,10 @@ const fetchItems = (props = null) => {
   });
 };
 
+const submit = () =>
+  handleSubmit({ form, url: route('admin.production-work-assignment.save') });
+
+// Kolom untuk q-table
 const columns = [
   { name: 'id', label: '#', field: 'id', align: 'left' },
   { name: 'datetime', label: 'Waktu', field: 'datetime', align: 'left', sortable: true },
@@ -176,12 +188,18 @@ const columns = [
   { name: 'notes', label: 'Catatan', field: 'notes', align: 'left' },
   { name: 'action', label: 'Aksi', field: 'action', align: 'center' },
 ];
+
 const computedColumns = computed(() => {
   if ($q.screen.gt.sm) return columns;
   return columns.filter((col) => ['id', 'action'].includes(col.name));
 });
 
+const selectedOrderItem = computed(() => {
+  return items.value.find(i => i.id === form.id);
+})
+
 </script>
+
 <template>
   <q-btn icon="add" color="primary" size="sm" dense label="Tambah&nbsp;&nbsp;" @click="openDialog()" />
   <q-table :columns="computedColumns" :rows="items" row-key="number" dense flat bordered class="q-mt-md"
@@ -205,7 +223,7 @@ const computedColumns = computed(() => {
           <div>{{ props.row.datetime }}</div>
         </q-td>
         <q-td key="item" :props="props" class="wrap-column">
-          #{{ props.row.work_assignment.id }}: {{ props.row.work_assignment.order_item.description }} : {{ props.row.work_assignment.quantity }} pt
+          #{{ props.row.work_assignment.id }}: {{ props.row.work_assignment.order_item?.description }} : {{ props.row.work_assignment.quantity }} pt
         </q-td>
         <q-td key="tailor" :props="props" class="wrap-column">
           #{{ props.row.work_assignment.tailor.id }} - {{ props.row.work_assignment.tailor.name }}
@@ -227,6 +245,7 @@ const computedColumns = computed(() => {
       </q-tr>
     </template>
   </q-table>
+
   <q-dialog v-model="notesDialog" style="min-width: 350px;" class="q-pa-sm">
     <q-card>
       <q-card-section>
@@ -236,6 +255,7 @@ const computedColumns = computed(() => {
     </q-card>
   </q-dialog>
   <q-dialog v-model="dialog" persistent>
+
     <q-card style="min-width: 350px;" class="q-pa-sm">
       <q-form @submit.prevent="save" @validation-error="scrollToFirstErrorField">
         <q-card-section>
@@ -251,7 +271,8 @@ const computedColumns = computed(() => {
             :error-message="form.errors.assignment_id" />
           <LocaleNumberInput v-model="form.quantity" dense label="Dikembalikan" lazy-rules :disable="form.processing"
             :error="!!form.errors.quantity" :error-message="form.errors.quantity" :rules="[
-              val => (val > 0) || 'Kwantitas harus diisi.'
+              val => (val > 0) || 'Kwantitas harus diisi.',
+              val => (!selectedOrderItem || val <= selectedOrderItem.ordered_quantity) || `Maksimum: ${selectedOrderItem.ordered_quantity}`
             ]" />
           <q-input v-model="form.notes" dense label="Catatan" type="textarea" autogrow length="100" />
           <q-card-actions align="center" class="q-pt-lg">
@@ -261,5 +282,7 @@ const computedColumns = computed(() => {
         </q-card-section>
       </q-form>
     </q-card>
+
   </q-dialog>
+
 </template>

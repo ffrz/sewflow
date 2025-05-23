@@ -156,6 +156,13 @@ Route::middleware([Auth::class])->group(function () {
             Route::post('delete/{id}', [ProductionWorkReturnController::class, 'delete'])->name('admin.production-work-return.delete');
         });
 
+        Route::prefix('production-tailor-payments')->group(function () {
+            Route::get('data/{order_id}', [ProductionWorkReturnController::class, 'data'])->name('admin.production-tailor-payment.data');
+            Route::get('assignments/{order_id}', [ProductionWorkReturnController::class, 'assignments'])->name('admin.production-tailor-payment.assignments');
+            Route::post('save', [ProductionWorkReturnController::class, 'save'])->name('admin.production-tailor-payment.save');
+            Route::post('delete/{id}', [ProductionWorkReturnController::class, 'delete'])->name('admin.production-tailor-payment.delete');
+        });
+
         Route::prefix('operational-cost-categories')->group(function () {
             Route::get('', [OperationalCostCategoryController::class, 'index'])->name('admin.operational-cost-category.index');
             Route::get('data', [OperationalCostCategoryController::class, 'data'])->name('admin.operational-cost-category.data');

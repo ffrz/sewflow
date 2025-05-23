@@ -1,7 +1,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import { handleSubmit, handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
+import { handleSubmit, handleFetchItems } from "@/helpers/client-req-handler";
 import { formatNumber, scrollToFirstErrorField, getQueryParams } from "@/helpers/utils";
 import axios from 'axios';
 import LocaleNumberInput from "@/components/LocaleNumberInput.vue";
@@ -185,9 +185,6 @@ const grand_total_price = computed(() => {
     return sum + (qty * price)
   }, 0);
 })
-
-const submit = () =>
-  handleSubmit({ form, url: route('admin.production-order-item.save') });
 
 // Kolom untuk q-table
 const columns = [

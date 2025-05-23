@@ -2,18 +2,17 @@
 
 namespace App\Models;
 
-class TailorPayment extends Model
+class ProductionTailorPayment extends Model
 {
     protected $fillable = [
         'work_assignment_id',
         'amount',
         'payment_date',
-        'payment_method',
         'notes',
     ];
 
-    public function workAssignment()
+    public function work_assignment()
     {
-        return $this->belongsTo(WorkAssignment::class);
+        return $this->belongsTo(WorkAssignment::class, 'work_assignment_id');
     }
 }
