@@ -143,6 +143,7 @@ Route::middleware([Auth::class])->group(function () {
             Route::get('', [ProductionTailorPayrollController::class, 'index'])->name('admin.production-tailor-payroll.index');
             Route::get('data', [ProductionTailorPayrollController::class, 'data'])->name('admin.production-tailor-payroll.data');
             Route::get('add', [ProductionTailorPayrollController::class, 'editor'])->name('admin.production-tailor-payroll.add');
+            Route::post('preview', [ProductionTailorPayrollController::class, 'preview'])->name('admin.production-tailor-payroll.preview');
             Route::get('edit/{id}', [ProductionTailorPayrollController::class, 'editor'])->name('admin.production-tailor-payroll.edit');
             Route::get('{id}/items', [ProductionTailorPayrollController::class, 'items'])->name('admin.production-tailor-payroll.items');
             Route::get('{id}/items/{item_id}', [ProductionTailorPayrollController::class, 'itemEditor'])->name('admin.production-tailor-payroll.edit-item');

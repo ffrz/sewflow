@@ -47,7 +47,7 @@ class ProductionTailorPaymentController extends Controller
             });
         }
 
-        $q->orderBy('payment_date', 'desc');
+        $q->orderBy('datetime', 'desc');
 
         $items = $q->paginate($request->get('per_page', 10))->withQueryString();
 

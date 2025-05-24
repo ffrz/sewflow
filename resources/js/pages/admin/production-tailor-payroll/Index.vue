@@ -28,40 +28,29 @@ const pagination = ref({
 const columns = [
   {
     name: "id",
-    label: "Order",
+    label: "#",
     field: "id",
     align: "left",
     sortable: true,
   },
   {
-    name: "customer",
-    label: "Pelanggan",
-    field: "customer",
+    name: "date",
+    label: "Tanggal",
+    field: "date",
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "tailor",
+    label: "Penjahit",
+    field: "tailor",
     align: "left",
   },
   {
-    name: "model",
-    label: "Model",
-    field: "model",
-    align: "left",
-  },
-  {
-    name: "quantity",
-    label: "Kwantitas",
-    field: "quantity",
-    align: "left",
-  },
-  {
-    name: "cost_price",
-    label: "Biaya / Harga",
-    field: "cost_price",
-    align: "left",
-  },
-  {
-    name: "progress",
-    label: "Progress",
-    field: "progress",
-    align: "left",
+    name: "amount",
+    label: "Jumlah",
+    field: "amount",
+    align: "right",
   },
   {
     name: "action",
@@ -71,8 +60,6 @@ const columns = [
 
 const statuses = [
   { value: "all", label: "Semua" },
-  // { value: "active", label: "Aktif" },
-  // { value: "inactive", label: "Tidak Aktif" },
 ];
 
 onMounted(() => {
@@ -111,8 +98,11 @@ const computedColumns = computed(() => {
   <authenticated-layout>
     <template #title>{{ title }}</template>
     <template #right-button>
-      <q-btn icon="add" dense color="primary" @click="router.get(route('admin.production-tailor-payroll.add'))" />
-      <q-btn class="q-ml-sm" :icon="!showFilter ? 'filter_alt' : 'filter_alt_off'" color="grey" dense
+      <q-btn icon="add" color="primary" @click="router.get(route('admin.production-tailor-payroll.add'))" size="small"
+        dense />
+      <q-btn icon="bolt" class="q-ml-xs" color="warning" label="Generate&nbsp;"
+        @click="router.get(route('admin.production-tailor-payroll.generate'))" size="small" dense />
+      <q-btn class="q-ml-xs" :icon="!showFilter ? 'filter_alt' : 'filter_alt_off'" color="grey" size="small" dense
         @click="showFilter = !showFilter" />
     </template>
     <template #header v-if="showFilter">

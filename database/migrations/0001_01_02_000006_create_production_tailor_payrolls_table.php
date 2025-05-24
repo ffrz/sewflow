@@ -17,7 +17,7 @@ return new class extends Migration
             $table->date('period_start');
             $table->date('period_end');
             $table->decimal('total_amount', 18, 2);
-
+            $table->text('notes');
             $table->enum('status', ['pending', 'paid'])->default('pending');
 
             $table->datetime('created_datetime')->nullable();
@@ -25,8 +25,6 @@ return new class extends Migration
 
             $table->foreignId('created_by_uid')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('updated_by_uid')->nullable()->constrained('users')->onDelete('set null');
-
-            $table->text('notes');
         });
     }
 

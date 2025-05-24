@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\ProductionTailorPayroll;
+use App\Models\ProductionWorkReturn;
 use App\Models\Tailor;
 use App\Models\User;
 use Carbon\Carbon;
@@ -16,13 +17,6 @@ class ProductionTailorPayrollController extends Controller
     public function index()
     {
         return inertia('admin/production-tailor-payroll/Index');
-    }
-
-    public function detail($id = 0)
-    {
-        return inertia('admin/production-tailor-payroll/Detail', [
-            'data' => ProductionTailorPayroll::with('customer')->findOrFail($id),
-        ]);
     }
 
     public function data(Request $request)
@@ -92,44 +86,27 @@ class ProductionTailorPayrollController extends Controller
     public function save(Request $request)
     {
         $validated = $request->validate([
-            'tailor_id' => 'required|exists:customers,id',
+            'tailor_id' => 'required|exists:tailors,id',
             'period_start' => 'required|date',
             'period_end' => 'required|date',
             'total_amount' => 'required|numeric',
-            'status' => 'required|string|max:50',
-            'notes' => 'nullable|string|max:255',
+            // 'status' => 'required|string|max:50',
+            // 'notes' => 'nullable|string|max:255',
         ]);
+        
+        $validated['status'] = 'paid';
 
-        $item = !$request->id ? new ProductionTailorPayroll() : ProductionTailorPayroll::findOrFail($request->post('id', 0));
-        $item->fill($validated);
+        DB::beginTransaction();
+
+        $item = new ProductionTailorPayroll();
+        $item->fill($validated);        
         $item->save();
+
+        DB::commit();
 
         return response()->json([
             'data' => $item,
-            'message' => "Order $item->id telah disimpan."
-        ]);
-    }
-
-    public function items(Request $request)
-    {
-        allowed_roles([User::Role_Admin]);
-        $item = ProductionTailorPayroll::with('customer')->findOrFail($request->id);
-
-        return inertia('admin/production-tailor-payroll/ItemEditor', [
-            'data' => $item,
-            'customers' => Customer::where('active', '=', true)->orderBy('name', 'asc')->get(),
-        ]);
-    }
-
-    public function itemEditor(Request $request)
-    {
-        allowed_roles([User::Role_Admin]);
-
-        $item = ProductionTailorPayroll::with('brand')->findOrFail($request->id);
-
-        return inertia('admin/production-tailor-payroll/ItemEditor', [
-            'data' => $item,
-            'customers' => Customer::where('active', '=', true)->orderBy('name', 'asc')->get(),
+            'message' => "Rekaman gaji $item->id telah disimpan."
         ]);
     }
 
@@ -142,6 +119,48 @@ class ProductionTailorPayrollController extends Controller
 
         return response()->json([
             'message' => "Order $item->id telah dihapus."
+        ]);
+    }
+
+    public function preview(Request $request)
+    {
+        $validated = $request->validate([
+            'tailor_id' => 'required|exists:tailors,id',
+            'period_start' => 'required|date',
+            'period_end' => 'required|date',
+            'notes' => 'nullable|string|max:255',
+        ]);
+
+        $tailorId = $validated['tailor_id'];
+        $start = $validated['period_start'];
+        $end = $validated['period_end'];
+
+        $q = ProductionWorkReturn::with([
+            'work_assignment',
+            'work_assignment.tailor',
+            'work_assignment.order_item',
+            'work_assignment.order_item.order',
+            'work_assignment.order_item.order.customer',
+        ]);
+
+        $q->whereHas('work_assignment', function ($query) use ($tailorId) {
+            $query->where('tailor_id', $tailorId);
+        });
+
+        $q->whereBetween('datetime', [$start, $end])
+            ->where('is_paid', false)
+            ->orderBy('datetime', 'asc');
+
+        $items = $q->get();
+        $totalQuantity = $items->sum('quantity');
+        $totalCost = $items->sum(function ($item) {
+            return $item->work_assignment->order_item->unit_cost * $item->quantity;
+        });
+
+        return response()->json([
+            'items' => $items,
+            'total_quantity' => $totalQuantity,
+            'total_cost' => $totalCost,
         ]);
     }
 }
