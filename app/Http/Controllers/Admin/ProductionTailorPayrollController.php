@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\ProductionTailorPayment;
 use App\Models\ProductionTailorPayroll;
 use App\Models\ProductionWorkReturn;
 use App\Models\Tailor;
@@ -25,30 +26,14 @@ class ProductionTailorPayrollController extends Controller
         $orderType = $request->get('order_type', 'desc');
         $filter = $request->get('filter', []);
 
-        // Subquery untuk menghitung total return quantity per order_id
-        $subQuery = DB::table('production_work_returns as r')
-            ->join('production_work_assignments as a', 'r.assignment_id', '=', 'a.id')
-            ->join('production_order_items as i', 'a.order_item_id', '=', 'i.id')
-            ->selectRaw('i.order_id, SUM(r.quantity) as total_returned')
-            ->groupBy('i.order_id');
-
         // Query utama
-        $q = ProductionTailorPayroll::with('customer')
-            ->leftJoinSub($subQuery, 'returns', function ($join) {
-                $join->on('production_orders.id', '=', 'returns.order_id');
-            })
-            ->select('production_orders.*')
-            ->selectRaw('COALESCE(returns.total_returned, 0) as returned_quantity')
-            ->selectRaw('CASE WHEN production_orders.total_quantity > 0 THEN
-                        ROUND(returns.total_returned / production_orders.total_quantity * 100, 2)
-                     ELSE 0 END as progress');
+        $q = ProductionTailorPayroll::with(['tailor']);
 
         // Filter
         if (!empty($filter['search'])) {
             $q->where(function ($q) use ($filter) {
-                $q->where('model', 'like', '%' . $filter['search'] . '%')
-                    ->orWhere('notes', 'like', '%' . $filter['search'] . '%')
-                    ->orWhereHas('customer', function ($q2) use ($filter) {
+                $q->where('notes', 'like', '%' . $filter['search'] . '%')
+                    ->orWhereHas('tailor', function ($q2) use ($filter) {
                         $q2->where('name', 'like', '%' . $filter['search'] . '%');
                     });
             });
@@ -91,22 +76,52 @@ class ProductionTailorPayrollController extends Controller
             'period_end' => 'required|date',
             'total_amount' => 'required|numeric',
             // 'status' => 'required|string|max:50',
-            // 'notes' => 'nullable|string|max:255',
+            'notes' => 'nullable|string|max:255',
         ]);
-        
+
         $validated['status'] = 'paid';
 
         DB::beginTransaction();
 
         $item = new ProductionTailorPayroll();
-        $item->fill($validated);        
+        $item->fill($validated);
         $item->save();
+
+        // ambil data work_returns yang belum dibayar berdasarkan tailor_id,
+        // untuk masing-maising item, buat rekaman ProductionTailorPayment
+
+        // 2. Ambil work_return yang belum dibayar
+        $returns = ProductionWorkReturn::whereHas('work_assignment', function ($query) use ($validated) {
+            $query->where('tailor_id', $validated['tailor_id']);
+        })
+            ->whereBetween('datetime', [$validated['period_start'] . ' 00:00:00', $validated['period_end'] . ' 23:59:59'])
+            ->where('is_paid', false)
+            ->get();
+
+        foreach ($returns as $return) {
+            // 3. Buat rekaman pembayaran
+            ProductionTailorPayment::create([
+                'payroll_id' => $item->id,
+                'datetime' => Carbon::now(),
+                'work_return_id' => $return->id,
+                'quantity' => $return->quantity,
+                'cost' => $return->work_assignment->order_item->unit_cost,
+                'amount' => $return->quantity * $return->work_assignment->order_item->unit_cost,
+                'method' => 'cash',
+                'notes' => 'Dibuat dari penggajian #' . $item->id
+            ]);
+
+            // 4. Tandai work_return sudah dibayar
+            $return->is_paid = true;
+            $return->save();
+        }
+
 
         DB::commit();
 
         return response()->json([
             'data' => $item,
-            'message' => "Rekaman gaji $item->id telah disimpan."
+            'message' => "Rekaman gaji #$item->id telah disimpan."
         ]);
     }
 
@@ -115,10 +130,17 @@ class ProductionTailorPayrollController extends Controller
         allowed_roles([User::Role_Admin]);
 
         $item = ProductionTailorPayroll::findOrFail($id);
+        $payments = ProductionTailorPayment::where('payroll_id', $item->id)->get();
+
+        DB::beginTransaction();
+        foreach ($payments as $payment) {
+            $payment->delete(); // otomatis set is_paid = false di production_work_return
+        }
         $item->delete();
+        DB::commit();
 
         return response()->json([
-            'message' => "Order $item->id telah dihapus."
+            'message' => "Rekaman gaji #$item->id telah dihapus."
         ]);
     }
 
@@ -147,7 +169,7 @@ class ProductionTailorPayrollController extends Controller
             $query->where('tailor_id', $tailorId);
         });
 
-        $q->whereBetween('datetime', [$start, $end])
+        $q->whereBetween('datetime', [$start . ' 00:00:00', $end . ' 23:59:59'])
             ->where('is_paid', false)
             ->orderBy('datetime', 'asc');
 
@@ -161,6 +183,22 @@ class ProductionTailorPayrollController extends Controller
             'items' => $items,
             'total_quantity' => $totalQuantity,
             'total_cost' => $totalCost,
+        ]);
+    }
+
+    
+    public function detail($id)
+    {
+        $item = ProductionTailorPayroll::with([
+            'tailor',
+            'payments',
+            'payments.work_return',
+            'payments.work_return.work_assignment',
+            'payments.work_return.work_assignment.order_item',
+            'payments.work_return.work_assignment.order_item.order',
+        ])->findOrFail($id);
+        return inertia('admin/production-tailor-payroll/Detail', [
+            'data' => $item
         ]);
     }
 }

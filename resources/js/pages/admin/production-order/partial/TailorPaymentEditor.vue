@@ -146,7 +146,7 @@ const fetchItems = (props = null) => {
     pagination,
     props,
     rows: items,
-    url: route("admin.production-tailor-payment.data", { order_id: form.order_id }),
+    url: route("admin.production-tailor-payment.data", { order_id: page.props.data.id }),
     loading,
   });
 };

@@ -65,6 +65,8 @@ const save = () => handleSubmit({
   url: route('admin.production-tailor-payroll.save'),
   onSuccess: (res) => {
     Notify.create({ message: 'Rekaman gaji telah disimpan.' });
+    dialog.value = false;
+    form.tailor_id = null;
   }
 });
 const filterTailors = (val, update) => {
@@ -106,7 +108,7 @@ onMounted(() => {
               <q-btn icon="visibility" type="submit" label="Tampilkan" color="primary" :disable="form.processing"
                 @click="preview" />
               <q-btn icon="cancel" label="Batal" :disable="form.processing"
-                @click="router.get(route('admin.operational-cost.index'))" />
+                @click="router.get(route('admin.production-tailor-payroll.index'))" />
             </q-card-section>
           </q-card>
         </q-form>
@@ -133,10 +135,6 @@ onMounted(() => {
                     = Rp. {{ formatNumber(item.quantity * item.work_assignment.order_item.unit_cost) }}
                   </div>
                 </div>
-                <hr>
-                <div>Total Order: {{ items.length }} order</div>
-                <div>Total Diselesaikan: {{ total_quantity }} potong</div>
-                <div>Total Upah Kerja: Rp. {{ formatNumber(total_cost) }}</div>
               </q-card-section>
               <q-card-section class="q-pt-none">
                 <LocaleNumberInput v-model:modelValue="form.total_amount" label="Total Pembayaran" lazyRules :disable="form.processing"

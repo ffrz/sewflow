@@ -30,7 +30,7 @@ class ProductionTailorPaymentController extends Controller
         return response()->json($items);
     }
 
-    public function data(Request $request)
+    public function data(Request $request, $order_id)
     {
         $q = ProductionTailorPayment::with([
             'work_return',
@@ -40,12 +40,9 @@ class ProductionTailorPaymentController extends Controller
             'work_return.work_assignment.order_item.order'
         ]);
 
-        // Filter berdasarkan order_id jika tersedia
-        if ($request->filled('order_id')) {
-            $q->whereHas('work_assignment.order_item.order', function ($query) use ($request) {
-                $query->where('id', $request->order_id);
-            });
-        }
+        $q->whereHas('work_return.work_assignment.order_item', function ($query) use ($order_id) {
+            $query->where('order_id', $order_id);
+        });
 
         $q->orderBy('datetime', 'desc');
 
@@ -53,7 +50,6 @@ class ProductionTailorPaymentController extends Controller
 
         return response()->json($items);
     }
-
 
     public function save(Request $request)
     {

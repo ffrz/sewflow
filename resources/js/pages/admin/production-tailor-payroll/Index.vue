@@ -34,23 +34,22 @@ const columns = [
     sortable: true,
   },
   {
-    name: "date",
-    label: "Tanggal",
-    field: "date",
-    align: "left",
-    sortable: true,
-  },
-  {
     name: "tailor",
     label: "Penjahit",
     field: "tailor",
     align: "left",
   },
   {
-    name: "amount",
+    name: "total_amount",
     label: "Jumlah",
-    field: "amount",
+    field: "total_amount",
     align: "right",
+  },
+  {
+    name: "notes",
+    label: "Catatan",
+    field: "notes",
+    align: "left",
   },
   {
     name: "action",
@@ -68,7 +67,7 @@ onMounted(() => {
 
 const deleteItem = (row) =>
   handleDelete({
-    message: `Hapus order #${row.id}?`,
+    message: `Hapus rekaman penggajian #${row.id}? Seluruh transaksi terkait akan dipulihkan.`,
     url: route("admin.production-tailor-payroll.delete", row.id),
     fetchItemsCallback: fetchItems,
     loading,
@@ -86,7 +85,7 @@ const fetchItems = (props = null) => {
 };
 
 const onFilterChange = () => fetchItems();
-const onRowClicked = (row) => router.get(route('admin.production-tailor-payroll.edit', { id: row.id }));
+const onRowClicked = (row) => router.get(route('admin.production-tailor-payroll.detail', { id: row.id }));
 const computedColumns = computed(() => {
   if ($q.screen.gt.sm) return columns;
   return columns.filter((col) => col.name === "id" || col.name === "action");
@@ -156,23 +155,15 @@ const computedColumns = computed(() => {
                   formatNumber(props.row.total_price) }}</div>
               </template>
             </q-td>
-            <q-td key="customer" :props="props">
-              {{ props.row.customer.name }}
+
+            <q-td key="tailor" :props="props">
+              #{{ props.row.tailor.id }} - {{ props.row.tailor.name }}
             </q-td>
-            <q-td key="model" :props="props">
-              {{ props.row.model }}
+            <q-td key="total_amount" :props="props">
+              {{ formatNumber(props.row.total_amount) }}
             </q-td>
-            <q-td key="quantity" :props="props">
-              {{ formatNumber(props.row.total_quantity) }} / {{ formatNumber(props.row.completed_quantity) }}
-            </q-td>
-            <q-td key="cost_price" :props="props">
-              Rp. {{ formatNumber(props.row.total_cost) }} / Rp. {{ formatNumber(props.row.total_price) }}
-            </q-td>
-            <q-td key="progress" :props="props">
-              {{ formatNumber(props.row.completed_quantity / props.row.total_quantity * 100) }}%
-              <q-linear-progress :value="props.row.total_quantity > 0
-                ? props.row.completed_quantity / props.row.total_quantity
-                : 0" color="primary" track-color="grey-3" size="10px" rounded stripe animated />
+            <q-td key="notes" :props="props">
+              {{ props.row.notes }}
             </q-td>
             <q-td key="action" :props="props">
               <div class="flex justify-end">
@@ -180,13 +171,6 @@ const computedColumns = computed(() => {
                   style="height: 40px; width: 30px" @click.stop>
                   <q-menu anchor="bottom right" self="top right" transition-show="scale" transition-hide="scale">
                     <q-list style="width: 200px">
-                      <q-item clickable v-ripple v-close-popup
-                        @click.stop="router.get(route('admin.production-tailor-payroll.edit', props.row.id))">
-                        <q-item-section avatar>
-                          <q-icon name="edit" />
-                        </q-item-section>
-                        <q-item-section icon="edit">Edit</q-item-section>
-                      </q-item>
                       <q-item @click.stop="deleteItem(props.row)" clickable v-ripple v-close-popup>
                         <q-item-section avatar>
                           <q-icon name="delete_forever" />
