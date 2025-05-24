@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductionOrderController;
 use App\Http\Controllers\Admin\ProductionOrderItemController;
 use App\Http\Controllers\Admin\ProductionTailorPaymentController;
+use App\Http\Controllers\Admin\ProductionTailorPayrollController;
 use App\Http\Controllers\Admin\ProductionWorkAssignmentController;
 use App\Http\Controllers\Admin\ProductionWorkReturnController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -138,6 +139,19 @@ Route::middleware([Auth::class])->group(function () {
             Route::post('delete/{id}', [ProductionOrderController::class, 'delete'])->name('admin.production-order.delete');
         });
 
+        Route::prefix('production-tailor-payrolls')->group(function () {
+            Route::get('', [ProductionTailorPayrollController::class, 'index'])->name('admin.production-tailor-payroll.index');
+            Route::get('data', [ProductionTailorPayrollController::class, 'data'])->name('admin.production-tailor-payroll.data');
+            Route::get('add', [ProductionTailorPayrollController::class, 'editor'])->name('admin.production-tailor-payroll.add');
+            Route::get('edit/{id}', [ProductionTailorPayrollController::class, 'editor'])->name('admin.production-tailor-payroll.edit');
+            Route::get('{id}/items', [ProductionTailorPayrollController::class, 'items'])->name('admin.production-tailor-payroll.items');
+            Route::get('{id}/items/{item_id}', [ProductionTailorPayrollController::class, 'itemEditor'])->name('admin.production-tailor-payroll.edit-item');
+            Route::get('duplicate/{id}', [ProductionTailorPayrollController::class, 'duplicate'])->name('admin.production-tailor-payroll.duplicate');
+            Route::get('detail/{id}', [ProductionTailorPayrollController::class, 'detail'])->name('admin.production-tailor-payroll.detail');
+            Route::post('save', [ProductionTailorPayrollController::class, 'save'])->name('admin.production-tailor-payroll.save');
+            Route::post('delete/{id}', [ProductionTailorPayrollController::class, 'delete'])->name('admin.production-tailor-payroll.delete');
+        });
+
         Route::prefix('production-order-items')->group(function () {
             Route::get('data/{order_id}', [ProductionOrderItemController::class, 'data'])->name('admin.production-order-item.data');
             Route::post('save', [ProductionOrderItemController::class, 'save'])->name('admin.production-order-item.save');
@@ -183,7 +197,6 @@ Route::middleware([Auth::class])->group(function () {
             Route::post('save', [OperationalCostController::class, 'save'])->name('admin.operational-cost.save');
             Route::post('delete/{id}', [OperationalCostController::class, 'delete'])->name('admin.operational-cost.delete');
         });
-
 
         Route::prefix('settings')->group(function () {
             Route::get('profile/edit', [ProfileController::class, 'edit'])->name('admin.profile.edit');

@@ -10,6 +10,7 @@ class ProductionTailorPayroll extends Model
         'period_end',
         'total_amount',
         'status',
+        'notes',
     ];
 
     public function tailor()

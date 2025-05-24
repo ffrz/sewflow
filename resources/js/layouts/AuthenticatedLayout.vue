@@ -130,7 +130,16 @@ onMounted(() => {
               <q-icon name="shopping_cart" />
             </q-item-section>
             <q-item-section>
-              <q-item-label>Order Maklun</q-item-label>
+              <q-item-label>Order</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/payrolls')"
+            @click="router.get(route('admin.production-tailor-payroll.index'))">
+            <q-item-section avatar>
+              <q-icon name="receipt" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Penggajian</q-item-label>
             </q-item-section>
           </q-item>
           <q-item clickable v-ripple :active="$page.url.startsWith('/admin/customers')"

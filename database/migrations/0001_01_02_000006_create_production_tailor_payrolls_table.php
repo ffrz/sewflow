@@ -25,6 +25,8 @@ return new class extends Migration
 
             $table->foreignId('created_by_uid')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('updated_by_uid')->nullable()->constrained('users')->onDelete('set null');
+
+            $table->text('notes');
         });
     }
 
