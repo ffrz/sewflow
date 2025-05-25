@@ -4,7 +4,7 @@ import { handleSubmit } from "@/helpers/client-req-handler";
 import { scrollToFirstErrorField } from "@/helpers/utils";
 
 const page = usePage();
-const title = (!!page.props.data.id ? "Edit" : "Tambah") + " Penjahit";
+const title = (!!page.props.data.id ? "Edit" : "Tambah") + " Karyawan";
 const form = useForm({
   id: page.props.data.id,
   name: page.props.data.name,
@@ -26,9 +26,9 @@ const submit = () =>
       <div class="col col-lg-6 q-pa-sm">
         <q-form class="row" @submit.prevent="submit" @validation-error="scrollToFirstErrorField">
           <q-card square flat bordered class="col">
-            <q-card-section>
-              <div class="text-subtitle1">Info Penjahit</div>
-            </q-card-section>
+            <!-- <q-card-section>
+              <div class="text-subtitle1">Info Karyawan</div>
+            </q-card-section> -->
             <q-card-section class="q-pt-none">
               <input type="hidden" name="id" v-model="form.id" />
               <q-input autofocus v-model.trim="form.name" label="Nama" lazy-rules :error="!!form.errors.name"

@@ -2,7 +2,7 @@
 import { router, usePage } from "@inertiajs/vue3";
 
 const page = usePage();
-const title = "Rincian Penjahit";
+const title = "Rincian Karyawan";
 
 </script>
 
@@ -15,12 +15,17 @@ const title = "Rincian Penjahit";
         <div class="row">
           <q-card square flat bordered class="col">
             <q-card-section>
-              <div class="text-subtitle1 text-bold text-grey-8">Info Penjahit</div>
+              <!-- <div class="text-subtitle1 text-bold text-grey-8">Info Penjahit</div> -->
               <table class="detail">
                   <tbody>
                     <tr>
-                      <td style="width:70px">Nama</td>
+                      <td style="width:70px">ID</td>
                       <td style="width:1px">:</td>
+                      <td>{{ page.props.data.id }}</td>
+                    </tr>
+                    <tr>
+                      <td>Nama</td>
+                      <td>:</td>
                       <td>{{ page.props.data.name }}</td>
                     </tr>
                     <tr>

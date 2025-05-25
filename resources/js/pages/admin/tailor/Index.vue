@@ -5,7 +5,7 @@ import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
 import { check_role, getQueryParams } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 
-const title = "Penjahit";
+const title = "Karyawan";
 const $q = useQuasar();
 const showFilter = ref(false);
 const rows = ref([]);
@@ -25,6 +25,13 @@ const pagination = ref({
 });
 
 const columns = [
+  {
+    name: "id",
+    label: "#",
+    field: "id",
+    align: "left",
+    sortable: true,
+  },
   {
     name: "name",
     label: "Nama",
@@ -133,6 +140,9 @@ const computedColumns = computed(() => {
         <template v-slot:body="props">
           <q-tr :props="props" :class="!props.row.active ? 'bg-red-1' : ''" class="cursor-pointer"
             @click="onRowClicked(props.row)">
+            <q-td key="id" :props="props">
+              {{ props.row.id }}
+            </q-td>
             <q-td key="name" :props="props" class="wrap-column">
               <div><q-icon name="person" v-if="$q.screen.lt.md" /> {{ props.row.name }}</div>
               <template v-if="$q.screen.lt.md">

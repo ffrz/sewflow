@@ -157,7 +157,7 @@ onMounted(() => {
               <q-icon name="person_apron" />
             </q-item-section>
             <q-item-section>
-              <q-item-label>Penjahit</q-item-label>
+              <q-item-label>Karyawan</q-item-label>
             </q-item-section>
           </q-item>
           <!-- </q-expansion-item> -->
