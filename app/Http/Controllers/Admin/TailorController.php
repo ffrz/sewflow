@@ -11,12 +11,12 @@ class TailorController extends Controller
 {
     public function index()
     {
-        return inertia('admin/tailor/Index');
+        return inertia('admin/employee/Index');
     }
 
     public function detail($id = 0)
     {
-        return inertia('admin/tailor/Detail', [
+        return inertia('admin/employee/Detail', [
             'data' => Tailor::findOrFail($id),
         ]);
     }
@@ -54,7 +54,7 @@ class TailorController extends Controller
         $item = Tailor::findOrFail($id);
         $item->id = null;
         $item->created_at = null;
-        return inertia('admin/tailor/Editor', [
+        return inertia('admin/employee/Editor', [
             'data' => $item,
         ]);
     }
@@ -63,37 +63,25 @@ class TailorController extends Controller
     {
         allowed_roles([User::Role_Admin]);
         $item = $id ? Tailor::findOrFail($id) : new Tailor(['active' => true]);
-        return inertia('admin/tailor/Editor', [
+        return inertia('admin/employee/Editor', [
             'data' => $item,
         ]);
     }
 
     public function save(Request $request)
     {
-        $rules = [
+        $validated = $request->validate([
             'name' => 'required|max:255',
             'phone' => 'required|max:100',
             'address' => 'required|max:1000',
-        ];
+            'active' => 'boolean',
+        ]);
 
-        $item = null;
-        $message = '';
-        $fields = ['name', 'phone', 'address', 'active'];
-
-        $request->validate($rules);
-
-        if (!$request->id) {
-            $item = new Tailor();
-            $message = 'tailor-created';
-        } else {
-            $item = Tailor::findOrFail($request->post('id', 0));
-            $message = 'tailor-updated';
-        }
-
-        $item->fill($request->only($fields));
+        $item = !$request->id ? new Tailor() : Tailor::findOrFail($request->post('id', 0));
+        $item->fill($validated);
         $item->save();
 
-        return redirect(route('admin.tailor.index'))->with('success', __("messages.$message", ['name' => $item->name]));
+        return redirect(route('admin.employee.index'))->with('success', "Karyawan {$item->name} telah disimpan.");
     }
 
     public function delete($id)
@@ -104,7 +92,7 @@ class TailorController extends Controller
         $item->delete();
 
         return response()->json([
-            'message' => __('messages.tailor-deleted', ['name' => $item->name])
+            'message' => "Karyawan {$item->name} telah dihapus.",
         ]);
     }
 }

@@ -93,15 +93,15 @@ Route::middleware([Auth::class])->group(function () {
             Route::post('delete/{id}', [ProductCategoryController::class, 'delete'])->name('admin.product-category.delete');
         });
 
-        Route::prefix('tailors')->group(function () {
-            Route::get('', [TailorController::class, 'index'])->name('admin.tailor.index');
-            Route::get('data', [TailorController::class, 'data'])->name('admin.tailor.data');
-            Route::get('add', [TailorController::class, 'editor'])->name('admin.tailor.add');
-            Route::get('duplicate/{id}', [TailorController::class, 'duplicate'])->name('admin.tailor.duplicate');
-            Route::get('edit/{id}', [TailorController::class, 'editor'])->name('admin.tailor.edit');
-            Route::get('detail/{id}', [TailorController::class, 'detail'])->name('admin.tailor.detail');
-            Route::post('save', [TailorController::class, 'save'])->name('admin.tailor.save');
-            Route::post('delete/{id}', [TailorController::class, 'delete'])->name('admin.tailor.delete');
+        Route::prefix('employees')->group(function () {
+            Route::get('', [TailorController::class, 'index'])->name('admin.employee.index');
+            Route::get('data', [TailorController::class, 'data'])->name('admin.employee.data');
+            Route::get('add', [TailorController::class, 'editor'])->name('admin.employee.add');
+            Route::get('duplicate/{id}', [TailorController::class, 'duplicate'])->name('admin.employee.duplicate');
+            Route::get('edit/{id}', [TailorController::class, 'editor'])->name('admin.employee.edit');
+            Route::get('detail/{id}', [TailorController::class, 'detail'])->name('admin.employee.detail');
+            Route::post('save', [TailorController::class, 'save'])->name('admin.employee.save');
+            Route::post('delete/{id}', [TailorController::class, 'delete'])->name('admin.employee.delete');
         });
 
         Route::prefix('customers')->group(function () {

@@ -72,7 +72,7 @@ onMounted(() => {
 const deleteItem = (row) =>
   handleDelete({
     message: `Hapus pelanggan ${row.name}?`,
-    url: route("admin.tailor.delete", row.id),
+    url: route("admin.employee.delete", row.id),
     fetchItemsCallback: fetchItems,
     loading,
   });
@@ -83,13 +83,13 @@ const fetchItems = (props = null) => {
     filter,
     props,
     rows,
-    url: route("admin.tailor.data"),
+    url: route("admin.employee.data"),
     loading,
   });
 };
 
 const onFilterChange = () => fetchItems();
-const onRowClicked = (row) => router.get(route('admin.tailor.detail', { id: row.id }));
+const onRowClicked = (row) => router.get(route('admin.employee.detail', { id: row.id }));
 const computedColumns = computed(() => {
   if ($q.screen.gt.sm) return columns;
   return columns.filter((col) => col.name === "name" || col.name === "action");
@@ -101,7 +101,7 @@ const computedColumns = computed(() => {
   <authenticated-layout>
     <template #title>{{ title }}</template>
     <template #right-button>
-      <q-btn icon="add" dense color="primary" @click="router.get(route('admin.tailor.add'))" />
+      <q-btn icon="add" dense color="primary" @click="router.get(route('admin.employee.add'))" />
       <q-btn class="q-ml-sm" :icon="!showFilter ? 'filter_alt' : 'filter_alt_off'" color="grey" dense
         @click="showFilter = !showFilter" />
     </template>
@@ -163,14 +163,14 @@ const computedColumns = computed(() => {
                   <q-menu anchor="bottom right" self="top right" transition-show="scale" transition-hide="scale">
                     <q-list style="width: 200px">
                       <q-item clickable v-ripple v-close-popup
-                        @click.stop="router.get(route('admin.tailor.duplicate', props.row.id))">
+                        @click.stop="router.get(route('admin.employee.duplicate', props.row.id))">
                         <q-item-section avatar>
                           <q-icon name="file_copy" />
                         </q-item-section>
                         <q-item-section icon="copy"> Duplikat </q-item-section>
                       </q-item>
                       <q-item clickable v-ripple v-close-popup
-                        @click.stop="router.get(route('admin.tailor.edit', props.row.id))">
+                        @click.stop="router.get(route('admin.employee.edit', props.row.id))">
                         <q-item-section avatar>
                           <q-icon name="edit" />
                         </q-item-section>

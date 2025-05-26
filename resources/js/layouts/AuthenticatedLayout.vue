@@ -151,8 +151,8 @@ onMounted(() => {
               <q-item-label>Pelanggan</q-item-label>
             </q-item-section>
           </q-item>
-          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/tailors')"
-            @click="router.get(route('admin.tailor.index'))">
+          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/employees')"
+            @click="router.get(route('admin.employee.index'))">
             <q-item-section avatar>
               <q-icon name="person_apron" />
             </q-item-section>
