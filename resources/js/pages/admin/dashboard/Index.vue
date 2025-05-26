@@ -73,7 +73,7 @@ const onFilterChange = () => {
                 { id: 4, name: 'Parinda', total: 730000 },
                 { id: 5, name: 'Anto', total: 1215000 },
               ]"
-              title="Top 5 Brand"
+              title="Top 5 Customer"
               route_url="admin.customer.index"
             />
           </div>
@@ -86,8 +86,8 @@ const onFilterChange = () => {
                 { id: 4, name: 'Uden', total: 88 },
                 { id: 5, name: 'Dani', total: 60 },
               ]"
-              title="Top 5 Penjahit"
-              route_url="admin.tailor.index"
+              title="Top 5 Karyawan"
+              route_url="admin.employee.index"
             />
           </div>
         </div>
